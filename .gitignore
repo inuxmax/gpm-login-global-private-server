@@ -16,3 +16,5 @@ yarn-error.log
 /.vscode
 *credentials.json
 phpunit.xml
+latest.zip
+latest-update.zip

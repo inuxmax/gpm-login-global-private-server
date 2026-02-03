@@ -23,7 +23,7 @@ class UpdateController extends Controller
      */
     public function updateFromRemoteZip(Request $request)
     {
-        $zipUrl = 'https://github.com/ngochoaitn/gpm-login-private-server/releases/download/latest/latest-update.zip';
+        $zipUrl = 'https://github.com/ngochoaitn/gpm-login-global-private-server/releases/download/latest/latest-update.zip';
 
         $result = $this->updateService->updateFromRemoteZip($zipUrl);
         return redirect()->back()->with('msg', $result['message']);
