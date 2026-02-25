@@ -87,7 +87,9 @@ class UploadService
                     'path' => 'storage/profiles',
                     'file_name' => $fileName,
                     'file_key' => 'storage/profiles/' . $fileName,
-                    'storage_path' => 'storage/profiles/' . $fileName
+                    'storage_path' => 'storage/profiles/' . $fileName,
+                    'etag' => md5_file($fullPath)
+                    
                 ]
             ];
         } catch (\Exception $e) {
@@ -110,6 +112,8 @@ class UploadService
     {
         $storedFile = $file->storeAs('public/profiles', $fileName);
         $fileName = str_replace("public/profiles/", "", $storedFile);
+        $fullPath = storage_path('app/' . $storedFile);
+        $etag = md5_file($fullPath);
 
         return [
             'success' => true,
@@ -118,7 +122,8 @@ class UploadService
                 'path' => 'storage/profiles',
                 'file_name' => $fileName,
                 'file_key' => 'storage/profiles/' . $fileName,
-                'storage_path' => 'storage/profiles/' . $fileName
+                'storage_path' => 'storage/profiles/' . $fileName,
+                'etag' => $etag
             ]
         ];
     }

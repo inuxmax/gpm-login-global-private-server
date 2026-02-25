@@ -32,8 +32,19 @@ class UploadController extends BaseController
             return $this->getJsonResponse(false, 'Failed', ['message' => 'file_name_is_required']);
         }
         $content = $request->file('file') ?? $request->getContent();
+        $etag = '';
         $result = $this->uploadService->storeFile($content, $fileName);
-        return $this->getJsonResponse($result['success'], $result['message'], $result['data']);
+        if ($result['success'] == true) {
+            $etag = $result['data']['etag'] ?? '';
+        }
+        return response()
+            ->json([
+                'success' => $result['success'],
+                'message' => $result['message'],
+                'data' => $result['data'],
+            ])
+            ->header('etag', '"' . $etag . '"');
+        // return $this->getJsonResponse($result['success'], $result['message'], $result['data']);
     }
 
     public function delete(Request $request)
