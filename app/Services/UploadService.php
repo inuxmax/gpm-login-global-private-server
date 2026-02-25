@@ -229,7 +229,9 @@ class UploadService
                         'data' => null
                     ];
                 }
-                $result = url($storage_path);
+                // $result = url($storage_path);
+                $fileName = basename($storage_path);
+                $result = url('/api/file/download/' . $fileName);
             }
 
             return [

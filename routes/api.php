@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\TagController;
 use App\Http\Controllers\Api\ProxyController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\DownloadController;
 use App\Http\Controllers\Api\SettingController;
 use App\Http\Controllers\Api\UploadController;
 use App\Http\Controllers\HomeController;
@@ -96,6 +97,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('create-upload-url', [UploadController::class, 'createUploadUrl']);
         Route::post('create-download-url', [UploadController::class, 'createDownloadUrl']);
         Route::post('check-file-exists', [UploadController::class, 'checkFileExists']);
+        Route::get('/download/{file}', [DownloadController::class, 'download']);
     });
 
     Route::prefix('tags')->group(function () {

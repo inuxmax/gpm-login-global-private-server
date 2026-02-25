@@ -113,4 +113,20 @@ class UploadController extends BaseController
         $result = $this->uploadService->checkFileExists($storagePath);
         return $this->getJsonResponse($result['success'], $result['message'], $result['data']);
     }
+
+    
+    public function download($file)
+    {
+        $fullPath = storage_path('app/public/profiles/' . $file);
+
+        if (!file_exists($fullPath)) {
+            abort(404);
+        }
+
+        $etag = md5_file($fullPath);
+
+        return response()->file($fullPath, [
+            'etag' => '"' . $etag . '"'
+        ]);
+    }
 }
