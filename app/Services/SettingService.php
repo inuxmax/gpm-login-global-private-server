@@ -8,7 +8,7 @@ use App\Models\User;
 
 class SettingService
 {
-    public static $server_version = 13;
+    public static $server_version = 14;
 
     public function initializeDefaultSettings()
     {
