@@ -25,7 +25,8 @@ RUN mkdir -p storage/app/public/profiles
 # Cấp quyền ghi cho storage và bootstrap/cache
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
-
+    
+RUN chown -R www-data:www-data /var/www/html
 # # Thiết lập quyền truy cập
 # RUN chown -R www-data:www-data /var/www \
 #     && chmod -R 775 /var/www/storage \

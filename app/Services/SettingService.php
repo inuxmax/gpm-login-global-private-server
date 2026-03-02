@@ -8,6 +8,7 @@ use App\Models\User;
 
 class SettingService
 {
+    // Sửa thêm tại resources\views\index.blade.php
     public static $server_version = 14;
 
     public function initializeDefaultSettings()

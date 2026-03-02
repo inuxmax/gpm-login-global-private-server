@@ -21,7 +21,8 @@ class UpdateService
             $archive = new PclZip($zipFilePath);
             $destination = base_path();
 
-            if ($archive->extract(PCLZIP_OPT_PATH, $destination) == 0) {
+            if ($archive->extract(PCLZIP_OPT_PATH, $destination,
+                    PCLZIP_OPT_REPLACE_NEWER) == 0) {
                 return ['success' => false, 'message' => 'Failed to extract the ZIP file'];
             }
 
