@@ -813,9 +813,9 @@ class ProfileService
         }
 
         // Check if profile is already in use by someone else
-        if ($profile->isInUse() && $profile->using_by != $userId) {
-            return ['success' => false, 'message' => 'profile_in_use_by_others', 'data' => null];
-        }
+        // if ($profile->isInUse() && $profile->using_by != $userId) {
+        //     return ['success' => false, 'message' => 'profile_in_use_by_others', 'data' => null];
+        // }
 
         // Mark profile as in use
         $profile->markAsInUse($user);
@@ -848,9 +848,9 @@ class ProfileService
         }
 
         // Only allow user to stop using if they are the current user
-        if ($profile->using_by != $userId) {
-            return ['success' => false, 'message' => 'profile_not_current_user', 'data' => null];
-        }
+        // if ($profile->using_by != $userId) {
+        //     return ['success' => false, 'message' => 'profile_not_current_user', 'data' => null];
+        // }
 
         // Mark profile as ready
         $profile->markAsReady();
