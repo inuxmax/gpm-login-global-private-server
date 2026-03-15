@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use App\Services\UploadService;
 use App\Services\S3UploadService;
@@ -19,6 +20,8 @@ class DownloadController extends BaseController
 
     public function download($file)
     {
+        $file = basename($file);
+        
         $fullPath = storage_path('app/public/profiles/' . $file);
 
         if (!file_exists($fullPath)) {

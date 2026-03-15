@@ -32,20 +32,36 @@ class UploadController extends BaseController
         if ($fileName == null) {
             return $this->getJsonResponse(false, 'Failed', ['message' => 'file_name_is_required']);
         }
-        $content = $request->file('file') ?? $request->getContent();
-        $etag = '';
-        $result = $this->uploadService->storeFile($content, $fileName, $checksumMD5);
-        if ($result['success'] == true) {
-            $etag = $result['data']['etag'] ?? '';
+        // >=v16 handle large file
+        $content = fopen('php://input', 'rb'); // PUT binary stream
+        
+        if (!$content) {
+            $content = $request->getContent();  // PUT binary stream
         }
-        return response()
-            ->json([
-                'success' => $result['success'],
-                'message' => $result['message'],
-                'data' => $result['data'],
-            ])
-            ->header('etag', '"' . $etag . '"');
-        // return $this->getJsonResponse($result['success'], $result['message'], $result['data']);
+        if (!$content) {
+            $content = $request->file('file'); // POST form-data
+        }
+        $etag = '';
+        try {
+            $result = $this->uploadService->storeFile($content, $fileName, $checksumMD5);
+            if ($result['success'] == true) {
+                $etag = $result['data']['etag'] ?? '';
+            }
+            return response()
+                ->json([
+                    'success' => $result['success'],
+                    'message' => $result['message'],
+                    'data' => $result['data'],
+                ])
+                ->header('etag', '"' . $etag . '"');
+        } catch (\Exception $e) {
+            return response()
+                ->json([
+                    'success' => false,
+                    'message' => 'upload_failed',
+                    'data' => $e->getMessage()
+                ]);
+        }
     }
 
     public function delete(Request $request)

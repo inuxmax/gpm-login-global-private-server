@@ -26,8 +26,13 @@ class UploadService
             ?string $checksumMD5 = null)
     {
         try {
+            // PUT binary >= v16
+            if (is_resource($file)) {
+                return $this->storeRawStreamLocally($file, $fileName, $checksumMD5);
+            }
+
             // Nếu là string (raw binary content)
-            // PUT binary
+            // PUT binary <= v15
             if (is_string($file)) {
                 if (strlen($file) > 0) {
                     return $this->storeRawContentLocally($file, $fileName,
@@ -72,6 +77,60 @@ class UploadService
                 'data' => $ex->getMessage() // tránh trả về cả exception object
             ];
         }
+    }
+
+    protected function storeRawStreamLocally($stream, string $fileName,
+            ?string $checksumMD5 = null)
+    {
+        $path = storage_path('app/public/profiles');
+
+        if (!is_dir($path)) {
+            mkdir($path, 0777, true);
+        }
+
+        $fileName = basename($fileName);
+
+        $tempFile = $path . '/' . bin2hex(random_bytes(16)) . '.temp';
+        $out = fopen($tempFile, 'wb');
+
+        $hashContext = hash_init('md5');
+
+        // stream_copy_to_stream($stream, $out);
+        $chunkSize = 4 * 1024 * 1024; // 4MB
+        while (!feof($stream)) {
+            $chunk = fread($stream, $chunkSize);
+            fwrite($out, $chunk);
+            hash_update($hashContext, $chunk);
+        }
+
+        fclose($out);
+
+        $etag = hash_final($hashContext);
+
+        if ($checksumMD5 && $etag !== $checksumMD5) {
+            unlink($tempFile);
+            return [
+                'success'=>false,
+                'message'=>'checksum_mismatch',
+                'data'=>$etag
+            ];
+        }
+
+        $fullPath = $path.'/'.$fileName;
+
+        rename($tempFile, $fullPath);
+
+        return [
+                'success' => true,
+                'message' => 'upload_success',
+                'data' => [
+                    'path' => 'storage/profiles',
+                    'file_name' => $fileName,
+                    'file_key' => 'storage/profiles/' . $fileName,
+                    'storage_path' => 'storage/profiles/' . $fileName,
+                    'etag' => $etag
+                ]
+            ];
     }
 
     protected function storeRawContentLocally(string $content, string $fileName,
