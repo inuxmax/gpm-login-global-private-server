@@ -22,13 +22,16 @@ class UploadService
      * @param string $fileName
      * @return array
      */
-    public function storeFile($file, string $fileName)
+    public function storeFile($file, string $fileName,
+            ?string $checksumMD5 = null)
     {
         try {
             // Nếu là string (raw binary content)
+            // PUT binary
             if (is_string($file)) {
                 if (strlen($file) > 0) {
-                    return $this->storeRawContentLocally($file, $fileName);
+                    return $this->storeRawContentLocally($file, $fileName,
+                            $checksumMD5);
                 } else {
                     return [
                         'success' => false,
@@ -42,6 +45,7 @@ class UploadService
             if ($file instanceof \Illuminate\Http\UploadedFile && $file->getSize() > 0) {
                 $this->settingService->initializeDefaultSettings();
 
+                // POST form-data
                 $storageType = $this->settingService->getSetting('storage_type')->value ?? 'local';
 
                 if ($storageType === 's3') {
@@ -51,7 +55,8 @@ class UploadService
                         'data' => ['message' => 's3_upload_not_supported']
                     ];
                 } else {
-                    return $this->storeFileLocally($file, $fileName);
+                    return $this->storeFileLocally($file, $fileName,
+                            $checksumMD5);
                 }
             }
 
@@ -69,16 +74,57 @@ class UploadService
         }
     }
 
-    protected function storeRawContentLocally(string $content, string $fileName)
+    protected function storeRawContentLocally(string $content, string $fileName,
+            ?string $checksumMD5 = null)
     {
         try {
             $path = storage_path('app/public/profiles');
-            if (!file_exists($path)) {
+            if (!is_dir($path)) {
                 mkdir($path, 0777, true);
             }
+            $fileName = basename($fileName);
 
             $fullPath = $path . '/' . $fileName;
-            file_put_contents($fullPath, $content);
+            $etag     = '';
+
+            if (!empty($checksumMD5)) {
+                $tempFileName = bin2hex(random_bytes(16)) . '.temp';
+                $tempFilePath = $path . '/' . $tempFileName;
+                if (file_put_contents($tempFilePath, $content) === false) {
+                    return [
+                        'success' => false,
+                        'message' => 'write_failed',
+                        'data' => null
+                    ];
+                }
+                $etag = md5_file($tempFilePath);
+                if ($etag !== $checksumMD5) {
+                    unlink($tempFilePath);
+                    return [
+                        'success' => false,
+                        'message' => 'checksum_mismatch',
+                        'data' => $etag
+                    ];
+                }
+                // Rename temp file to final file name
+                if (!rename($tempFilePath, $fullPath)) {
+                    unlink($tempFilePath);
+                    return [
+                        'success' => false,
+                        'message' => 'rename_failed',
+                        'data' => null
+                    ];
+                }
+            } else {
+                if (file_put_contents($fullPath, $content) === false) {
+                    return [
+                        'success' => false,
+                        'message' => 'write_failed',
+                        'data' => null
+                    ];
+                }
+                $etag = md5_file($fullPath);
+            }
 
             return [
                 'success' => true,
@@ -88,8 +134,7 @@ class UploadService
                     'file_name' => $fileName,
                     'file_key' => 'storage/profiles/' . $fileName,
                     'storage_path' => 'storage/profiles/' . $fileName,
-                    'etag' => md5_file($fullPath)
-                    
+                    'etag' => $etag
                 ]
             ];
         } catch (\Exception $e) {
@@ -108,12 +153,38 @@ class UploadService
      * @param string $fileName
      * @return array
      */
-    private function storeFileLocally($file, string $fileName)
+    private function storeFileLocally($file, string $fileName,
+            ?string $checksumMD5 = null)
     {
-        $storedFile = $file->storeAs('public/profiles', $fileName);
-        $fileName = str_replace("public/profiles/", "", $storedFile);
-        $fullPath = storage_path('app/' . $storedFile);
-        $etag = md5_file($fullPath);
+        $fileName = basename($fileName);
+        $storedFile = '';
+        $etag       = '';
+
+        if (!empty($checksumMD5)) {
+            $tempFileName = bin2hex(random_bytes(16)) . '.temp';
+            $storedFile = $file->storeAs('public/profiles', $tempFileName);
+
+            $fullPath = storage_path('app/' . $storedFile);
+            $etag = md5_file($fullPath);
+            if ($etag !== $checksumMD5) {
+                Storage::disk('public')->delete('profiles/' . $tempFileName);
+                return [
+                    'success' => false,
+                    'message' => 'checksum_mismatch',
+                    'data' => $etag
+                ];
+            }
+
+             // Rename file to the original file name
+             $newStoredFile = 'profiles/' . $fileName;
+             Storage::disk('public')->move('profiles/' . $tempFileName,
+                    $newStoredFile);
+
+        } else {
+            $storedFile = $file->storeAs('public/profiles', $fileName);
+            $fullPath = storage_path('app/' . $storedFile);
+            $etag = md5_file($fullPath);
+        }
 
         return [
             'success' => true,

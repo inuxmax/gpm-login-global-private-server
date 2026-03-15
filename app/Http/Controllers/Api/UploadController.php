@@ -28,12 +28,13 @@ class UploadController extends BaseController
     public function store(Request $request)
     {
         $fileName = $request->file_name ?? $request->query('file_name', null);
+        $checksumMD5 = $request->checksum ?? $request->query('checksum', null);
         if ($fileName == null) {
             return $this->getJsonResponse(false, 'Failed', ['message' => 'file_name_is_required']);
         }
         $content = $request->file('file') ?? $request->getContent();
         $etag = '';
-        $result = $this->uploadService->storeFile($content, $fileName);
+        $result = $this->uploadService->storeFile($content, $fileName, $checksumMD5);
         if ($result['success'] == true) {
             $etag = $result['data']['etag'] ?? '';
         }
