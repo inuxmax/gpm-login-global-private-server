@@ -47,6 +47,10 @@ class UploadController extends BaseController
             if ($result['success'] == true) {
                 $etag = $result['data']['etag'] ?? '';
             }
+            if (is_resource($content)) {
+                try { fclose($content); }
+                catch (\Exception $e) { }
+            }   
             return response()
                 ->json([
                     'success' => $result['success'],
