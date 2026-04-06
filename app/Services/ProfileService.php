@@ -647,20 +647,23 @@ class ProfileService
     {
         $count = 0;
         $lastError = null;
-        if($newValue != null) {
+        if($newValue !== null) {
             $array = preg_split('/\r\n|\r|\n/', $newValue);
-            $countArray = count($array);
-            $index = 0;
-            foreach ($profileIds as $profileId) {
-                $value = $array[$index % $countArray] ?? null;
-                $result = $this->editProperty($profileId, $fieldName, $value);
-                if ($result['success']) {
-                    $count++;
-                } else {
-                    $lastError = $result['message'];
-                }
-                $index++;
+        } else {
+             $array = [null];
+        }
+
+        $countArray = count($array);
+        $index = 0;
+        foreach ($profileIds as $profileId) {
+            $value = $array[$index % $countArray] ?? null;
+            $result = $this->editProperty($profileId, $fieldName, $value);
+            if ($result['success']) {
+                $count++;
+            } else {
+                $lastError = $result['message'];
             }
+            $index++;
         }
 
         $total = count(value: $profileIds);

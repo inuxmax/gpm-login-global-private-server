@@ -165,8 +165,24 @@ class ProfileController extends BaseController
 
     public function bulkEditProperty(Request $request)
     {
+        if (!$request->field_name) {
+            return $this->getJsonResponse(false, 'field_name is required', null);
+        }
+
+        // new_value có thể rỗng hoặc null
+        // nên không thể lấy trực tiếp từ $request->new_value mà phải
+        // decode từ raw content
+        $raw = $request->getContent();
+        $decoded = json_decode($raw, true);
+        $new_value = null;
+        try {
+            $new_value = $decoded['new_value'];
+        } catch (\Exception $e) {
+            return $this->getJsonResponse(false, 'new_value is required', null);
+        }
+
         $profile_ids = $request->profile_ids ?? $request->ids ?? [];
-        $result = $this->profileService->bulkEditProperty($profile_ids, $request->field_name, $request->new_value);
+        $result = $this->profileService->bulkEditProperty($profile_ids, $request->field_name, $new_value);
         return $this->getJsonResponse($result['success'], $result['message'], $result['data']);
     }
 
