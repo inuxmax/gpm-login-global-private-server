@@ -31,13 +31,17 @@ class GroupController extends BaseController
     {
         $user = $request->user();
 
-        $group = $this->groupService->createGroup(
-            $request->name,
-            $request->order,
-            $user->id
-        );
+        try {
+            $group = $this->groupService->createGroup(
+                $request->name,
+                $request->order,
+                $user->id
+            );
 
-        return $this->getJsonResponse(true, 'group_created', $group);
+            return $this->getJsonResponse(true, 'group_created', $group);
+        } catch (\Exception $e) {
+            return $this->getJsonResponse(false, $e->getMessage(), null);
+        }
     }
 
     public function show($id, Request $request)

@@ -71,6 +71,14 @@ class GroupService
      */
     public function createGroup(string $name, int $order, string $userId)
     {
+        $exists = Group::where('name', $name)
+        ->where('created_by', $userId)
+        ->exists();
+
+        if ($exists) {
+            throw new \Exception('group_exists');
+        }
+
         $group = new Group();
         $group->name = $name;
         $group->sort_order = $order;
