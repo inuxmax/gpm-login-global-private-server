@@ -72,5 +72,8 @@ Route::middleware(['admin.only'])->group(function () {
         Route::post('/run-migrations', [AdminApiController::class, 'runMigrations']);
 
         Route::post('/logout', [AdminApiController::class, 'logout']);
+
+        // Admin-only filesystem lookups (SPA uses /api/profiles for CRUD)
+        Route::get('/profiles/storage-sizes', [AdminApiController::class, 'profileStorageSizes']);
     });
 });

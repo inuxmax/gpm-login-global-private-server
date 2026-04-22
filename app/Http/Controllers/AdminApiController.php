@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Models\Profile;
 use App\Services\AdminService;
 use App\Services\SettingService;
 use App\Services\WebAuthService;
@@ -131,5 +132,46 @@ class AdminApiController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return response()->json(['success' => true]);
+    }
+
+    /**
+     * Batch lookup of local storage sizes. Input: ids[]= (query). Output:
+     * { id: { bytes: int, exists: bool, path: string } } for each profile
+     * whose storage_path resolves to an existing file on the host.
+     */
+    public function profileStorageSizes(Request $request)
+    {
+        $ids = $request->query('ids', []);
+        if (is_string($ids)) {
+            $ids = array_filter(array_map('trim', explode(',', $ids)));
+        }
+        if (!is_array($ids) || count($ids) === 0) {
+            return response()->json(['success' => true, 'data' => new \stdClass()]);
+        }
+
+        $profiles = Profile::whereIn('id', $ids)
+            ->select('id', 'storage_path')
+            ->get();
+
+        $result = [];
+        foreach ($profiles as $profile) {
+            $path = (string) $profile->storage_path;
+            if ($path === '' || !preg_match('#^storage/profiles/#i', $path)) {
+                continue;
+            }
+
+            // "storage/profiles/abc.zip" → "profiles/abc.zip" → {project}/storage/app/public/profiles/abc.zip
+            $relative = ltrim(preg_replace('#^storage/#i', '', $path), '/');
+            $absolute = storage_path('app/public/' . $relative);
+
+            if (is_file($absolute)) {
+                $result[$profile->id] = [
+                    'bytes' => @filesize($absolute) ?: 0,
+                    'exists' => true,
+                ];
+            }
+        }
+
+        return response()->json(['success' => true, 'data' => $result]);
     }
 }

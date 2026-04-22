@@ -3,6 +3,7 @@ import MainLayout from './layouts/MainLayout.vue';
 import SystemSettings from './pages/SystemSettings.vue';
 import Users from './pages/Users.vue';
 import Groups from './pages/Groups.vue';
+import Profiles from './pages/Profiles.vue';
 import Placeholder from './pages/Placeholder.vue';
 
 const routes = [
@@ -32,8 +33,8 @@ const routes = [
             {
                 path: 'profiles',
                 name: 'profiles',
-                component: Placeholder,
-                meta: { titleKey: 'menu.profiles', icon: 'User', phase: 3 },
+                component: Profiles,
+                meta: { titleKey: 'menu.profiles', icon: 'UserFilled' },
             },
             {
                 path: 'proxies',
