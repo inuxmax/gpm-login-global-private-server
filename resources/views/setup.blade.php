@@ -15,6 +15,12 @@
     <div id="app">
         <div class="center-box">
             <h1>Kết nối database thất bại. Vui lòng kiểm tra lại cấu hình tại file .env</h1>
+            @if(!empty($error ?? null))
+                <div class="alert alert-danger mt-3">
+                    <strong>Chi tiết lỗi:</strong>
+                    <pre class="mb-0">{{ $error }}</pre>
+                </div>
+            @endif
         </div>
     </div>
 </body>

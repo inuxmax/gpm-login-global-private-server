@@ -17,19 +17,21 @@ class HomeController extends Controller
 
     public function index()
     {
-        if ($this->setupService->isDatabaseSetup()) {
+        $result = $this->setupService->isDatabaseSetup();
+        if ($result['success']) {
             return view("ready");
         } else {
-            return redirect('/setup');
+            return view('setup', ['error' => $result['message']]);
         }
     }
 
     public function setup()
     {
-        if ($this->setupService->isDatabaseSetup()) {
+        $result = $this->setupService->isDatabaseSetup();
+        if ($result['success']) {
             return redirect('/');
         } else {
-            return view('setup');
+            return view('setup', ['error' => $result['message']]);
         }
     }
 

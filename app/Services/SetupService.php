@@ -13,16 +13,22 @@ class SetupService
     /**
      * Check if database is set up
      *
-     * @return bool
+     * @return array
      */
     public function isDatabaseSetup()
     {
         try {
             $query = "select * from users";
             DB::select($query);
-            return true;
+            return [
+                'success' => true,
+                'message' => ''
+            ];
         } catch (\Exception $ex) {
-            return false;
+            return [
+                'success' => false,
+                'message' => $ex->getMessage()
+            ];
         }
     }
 

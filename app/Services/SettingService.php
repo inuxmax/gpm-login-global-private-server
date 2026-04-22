@@ -8,7 +8,9 @@ use App\Models\User;
 
 class SettingService
 {
-    // Match resources\views\index.blade.php
+    // Match:
+    // - resources\views\index.blade.php
+    // - resources\views\ready.blade.php
     public static $server_version = 18;
 
     public function initializeDefaultSettings()
