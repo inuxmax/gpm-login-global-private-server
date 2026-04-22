@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Private server v{{ \App\Services\SettingService::$server_version }}</title>
+    <title>GPM Login Private server Global v{{ \App\Services\SettingService::$server_version }}</title>
 
     <style>
         .container {

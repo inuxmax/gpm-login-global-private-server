@@ -60,8 +60,17 @@
                     <span style="font-size: 12px; color: #6b7280">{{ formatTime(row.updated_at) }}</span>
                 </template>
             </el-table-column>
-            <el-table-column :label="t('common.actions')" width="200" fixed="right">
+            <el-table-column :label="t('common.actions')" width="280" fixed="right">
                 <template #default="{ row }">
+                    <el-button
+                        size="small"
+                        type="info"
+                        plain
+                        :disabled="isDefaultGroup(row)"
+                        @click="openShare(row)"
+                    >
+                        <el-icon><Share /></el-icon>
+                    </el-button>
                     <el-button
                         size="small"
                         type="primary"
@@ -80,8 +89,7 @@
                         :loading="row._deleting"
                         @click="deleteGroup(row)"
                     >
-                        <el-icon style="margin-right: 3px"><Delete /></el-icon>
-                        {{ t('common.delete') }}
+                        <el-icon><Delete /></el-icon>
                     </el-button>
                 </template>
             </el-table-column>
@@ -99,6 +107,13 @@
                 @size-change="onSizeChange"
             />
         </div>
+
+        <ShareDialog
+            v-model="shareDialog.visible"
+            type="group"
+            :ids="shareDialog.id"
+            :name="shareDialog.name"
+        />
 
         <el-dialog
             v-model="dialog.visible"
@@ -135,6 +150,7 @@ import { onMounted, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { apiV1 } from '../api/http';
+import ShareDialog from '../components/ShareDialog.vue';
 
 const { t } = useI18n();
 
@@ -155,6 +171,14 @@ const dialog = reactive({
     saving: false,
     form: { id: null, name: '', order: 0 },
 });
+
+const shareDialog = reactive({ visible: false, id: '', name: '' });
+
+function openShare(row) {
+    shareDialog.id = row.id;
+    shareDialog.name = row.name;
+    shareDialog.visible = true;
+}
 
 const rules = {
     name: [{ required: true, message: () => t('groups.nameRequired'), trigger: 'blur' }],

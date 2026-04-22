@@ -34,6 +34,10 @@
             <el-tag type="info" disable-transitions>
                 {{ t('profiles.selected', { count: selection.length }) }}
             </el-tag>
+            <el-button type="info" plain size="default" @click="openBulkShare">
+                <el-icon style="margin-right: 3px"><Share /></el-icon>
+                {{ t('share.title') }}
+            </el-button>
             <el-button type="danger" plain size="default" :loading="bulkBusy" @click="bulkDelete">
                 <el-icon style="margin-right: 3px"><Delete /></el-icon>
                 {{ t('common.delete') }}
@@ -99,8 +103,11 @@
                     <span style="font-size: 12px; color: #6b7280">{{ formatTime(row.created_at) }}</span>
                 </template>
             </el-table-column>
-            <el-table-column :label="t('common.actions')" width="180" fixed="right">
+            <el-table-column :label="t('common.actions')" width="220" fixed="right">
                 <template #default="{ row }">
+                    <el-button size="small" type="info" plain @click="openShare(row)">
+                        <el-icon><Share /></el-icon>
+                    </el-button>
                     <el-button size="small" type="primary" plain @click="openEdit(row)">
                         <el-icon style="margin-right: 3px"><Edit /></el-icon>
                         {{ t('common.edit') }}
@@ -124,6 +131,13 @@
                 @size-change="onSizeChange"
             />
         </div>
+
+        <ShareDialog
+            v-model="shareDialog.visible"
+            type="proxy"
+            :ids="shareDialog.ids"
+            :name="shareDialog.name"
+        />
 
         <el-dialog
             v-model="addDialog.visible"
@@ -191,6 +205,7 @@ import { onMounted, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { apiV1 } from '../api/http';
+import ShareDialog from '../components/ShareDialog.vue';
 
 const { t } = useI18n();
 
@@ -206,6 +221,21 @@ let searchTimer = null;
 
 const addDialog = reactive({ visible: false, text: '', saving: false });
 const editDialog = reactive({ visible: false, id: null, raw: '', saving: false });
+const shareDialog = ref({ visible: false, ids: [], name: '' });
+
+function openShare(row) {
+    shareDialog.value = {
+        visible: true,
+        ids: [row.id],
+        name: displayHostPort(row.raw_proxy),
+    };
+}
+
+function openBulkShare() {
+    const ids = selection.value.map((r) => r.id);
+    if (ids.length === 0) return;
+    shareDialog.value = { visible: true, ids, name: '' };
+}
 
 function formatTime(value) {
     if (!value) return '—';

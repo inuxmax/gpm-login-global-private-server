@@ -66,6 +66,10 @@
                     {{ t('profiles.selected', { count: selection.length }) }}
                 </el-tag>
                 <template v-if="tab === 'active'">
+                    <el-button type="info" plain size="default" @click="openBulkShare">
+                        <el-icon style="margin-right: 3px"><Share /></el-icon>
+                        {{ t('share.title') }}
+                    </el-button>
                     <el-button type="warning" plain size="default" :loading="bulkBusy" @click="bulkSoftDelete">
                         <el-icon style="margin-right: 3px"><Delete /></el-icon>
                         {{ t('profiles.softDelete') }}
@@ -166,9 +170,12 @@
                     </span>
                 </template>
             </el-table-column>
-            <el-table-column :label="t('common.actions')" width="200" fixed="right">
+            <el-table-column :label="t('common.actions')" width="240" fixed="right">
                 <template #default="{ row }">
                     <template v-if="tab === 'active'">
+                        <el-button size="small" type="info" plain @click="openShare(row)">
+                            <el-icon><Share /></el-icon>
+                        </el-button>
                         <el-button
                             size="small"
                             type="success"
@@ -203,6 +210,13 @@
             </el-table-column>
         </el-table>
 
+        <ShareDialog
+            v-model="shareDialog.visible"
+            type="profile"
+            :ids="shareDialog.ids"
+            :name="shareDialog.name"
+        />
+
         <div style="display: flex; justify-content: flex-end; margin-top: 16px">
             <el-pagination
                 v-model:current-page="page"
@@ -223,6 +237,7 @@ import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { apiV1, http } from '../api/http';
+import ShareDialog from '../components/ShareDialog.vue';
 
 const { t } = useI18n();
 
@@ -239,6 +254,18 @@ const selection = ref([]);
 const sizes = ref({});
 const bulkBusy = ref(false);
 let searchTimer = null;
+
+const shareDialog = ref({ visible: false, ids: [], name: '' });
+
+function openShare(row) {
+    shareDialog.value = { visible: true, ids: [row.id], name: row.name };
+}
+
+function openBulkShare() {
+    const ids = selection.value.map((r) => r.id);
+    if (ids.length === 0) return;
+    shareDialog.value = { visible: true, ids, name: '' };
+}
 
 function formatTime(value) {
     if (!value) return '—';

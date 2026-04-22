@@ -30,7 +30,7 @@ use App\Http\Controllers\HomeController;
 Route::get('/info', function () {
     return response()->json([
         'version' => '2.0',
-        'message' => 'GPM Login Private Server API v2',
+        'message' => 'GPM Login Private Server Global API v2',
         'timestamp' => now()->toISOString()
     ]);
 });
