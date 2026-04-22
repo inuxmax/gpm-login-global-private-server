@@ -6,6 +6,8 @@
 ```
 composer update
 composer install
+php artisan migrate
+php artisan db:Seed
 php artisan serve --port=8081
 ```
 
