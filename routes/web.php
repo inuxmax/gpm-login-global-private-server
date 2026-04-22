@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminApiController;
 use App\Http\Controllers\UpdateController;
 
 /*
@@ -45,4 +46,30 @@ Route::middleware(['auth:sanctum'])->get('/phpinfo', function () {
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/auto-update', [UpdateController::class, 'updateFromRemoteZip']);
+});
+
+// ========================================
+// New SPA (Vue 3) admin UI
+// ========================================
+Route::middleware(['admin.only'])->group(function () {
+    // SPA shell — all /admin/app/* paths fall through to Vue Router
+    Route::get('/admin/app', fn () => view('admin-app'));
+    Route::get('/admin/app/{any}', fn () => view('admin-app'))->where('any', '.*');
+
+    // Admin JSON API consumed by the SPA
+    Route::prefix('admin/api')->group(function () {
+        Route::get('/me', [AdminApiController::class, 'me']);
+
+        Route::get('/settings', [AdminApiController::class, 'getSettings']);
+        Route::post('/settings', [AdminApiController::class, 'saveSettings']);
+
+        Route::get('/users', [AdminApiController::class, 'getUsers']);
+        Route::post('/users/{id}/toggle-active', [AdminApiController::class, 'toggleActiveUser']);
+        Route::post('/users/{id}/reset-password', [AdminApiController::class, 'resetUserPassword']);
+
+        Route::post('/reset-profile-status', [AdminApiController::class, 'resetProfileStatus']);
+        Route::post('/run-migrations', [AdminApiController::class, 'runMigrations']);
+
+        Route::post('/logout', [AdminApiController::class, 'logout']);
+    });
 });
