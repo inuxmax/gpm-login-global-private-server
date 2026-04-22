@@ -52,7 +52,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 // New SPA (Vue 3) admin UI
 // ========================================
 Route::middleware(['admin.only'])->group(function () {
-    // SPA shell — all /admin/app/* paths fall through to Vue Router
+    // SPA shell — all /admin/app/* paths fall through to Vue Router.
+    // SPA reuses /api/* endpoints via session cookie auth (see config/sanctum.php).
     Route::get('/admin/app', fn () => view('admin-app'));
     Route::get('/admin/app/{any}', fn () => view('admin-app'))->where('any', '.*');
 

@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import MainLayout from './layouts/MainLayout.vue';
 import SystemSettings from './pages/SystemSettings.vue';
 import Users from './pages/Users.vue';
+import Groups from './pages/Groups.vue';
 import Placeholder from './pages/Placeholder.vue';
 
 const routes = [
@@ -25,8 +26,8 @@ const routes = [
             {
                 path: 'groups',
                 name: 'groups',
-                component: Placeholder,
-                meta: { titleKey: 'menu.groups', icon: 'Collection', phase: 2 },
+                component: Groups,
+                meta: { titleKey: 'menu.groups', icon: 'Collection' },
             },
             {
                 path: 'profiles',
