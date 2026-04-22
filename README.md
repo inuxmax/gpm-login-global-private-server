@@ -31,5 +31,4 @@ docker buildx build --platform linux/amd64,linux/arm64 -t ngochoaitn/gpm-login-g
 ```
 
 ## Create file update
-- Create zip all folder
-- Remove artisan, vendor/composer, vender/autoload.php
+`py create-zip-file.py`
