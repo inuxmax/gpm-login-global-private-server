@@ -112,6 +112,8 @@ export default {
         selected: '已选 {count} 个',
         empty: '暂无配置',
         emptyTrash: '回收站为空',
+        edit: '编辑配置',
+        nameRequired: '请输入名称',
     },
     proxies: {
         rawProxy: '代理',

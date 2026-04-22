@@ -170,42 +170,60 @@
                     </span>
                 </template>
             </el-table-column>
-            <el-table-column :label="t('common.actions')" width="240" fixed="right">
+            <el-table-column :label="t('common.actions')" width="180" fixed="right">
                 <template #default="{ row }">
-                    <template v-if="tab === 'active'">
-                        <el-button size="small" type="info" plain @click="openShare(row)">
-                            <el-icon><Share /></el-icon>
-                        </el-button>
-                        <el-button
-                            size="small"
-                            type="success"
-                            plain
-                            :disabled="row.status === 1"
-                            :loading="row._busy"
-                            @click="resetStatus(row)"
-                        >
-                            <el-icon style="margin-right: 3px"><RefreshRight /></el-icon>
-                            {{ t('profiles.resetStatus') }}
-                        </el-button>
-                        <el-button
-                            size="small"
-                            type="warning"
-                            plain
-                            :loading="row._busy"
-                            @click="softDelete(row)"
-                        >
-                            <el-icon><Delete /></el-icon>
-                        </el-button>
-                    </template>
-                    <template v-else>
-                        <el-button size="small" type="success" plain :loading="row._busy" @click="restore(row)">
-                            <el-icon style="margin-right: 3px"><RefreshRight /></el-icon>
-                            {{ t('profiles.restore') }}
-                        </el-button>
-                        <el-button size="small" type="danger" plain :loading="row._busy" @click="hardDelete(row)">
-                            <el-icon><Remove /></el-icon>
-                        </el-button>
-                    </template>
+                    <div
+                        class="profile-actions"
+                        style="display: flex; flex-wrap: nowrap; gap: 4px; justify-content: flex-start"
+                    >
+                        <template v-if="tab === 'active'">
+                            <el-tooltip :content="t('common.edit')" placement="top" :show-after="300">
+                                <el-button size="small" type="primary" plain @click="openEdit(row)">
+                                    <el-icon><Edit /></el-icon>
+                                </el-button>
+                            </el-tooltip>
+                            <el-tooltip :content="t('share.title')" placement="top" :show-after="300">
+                                <el-button size="small" type="info" plain @click="openShare(row)">
+                                    <el-icon><Share /></el-icon>
+                                </el-button>
+                            </el-tooltip>
+                            <el-tooltip :content="t('profiles.resetStatus')" placement="top" :show-after="300">
+                                <el-button
+                                    size="small"
+                                    type="success"
+                                    plain
+                                    :disabled="row.status === 1"
+                                    :loading="row._busy"
+                                    @click="resetStatus(row)"
+                                >
+                                    <el-icon><RefreshRight /></el-icon>
+                                </el-button>
+                            </el-tooltip>
+                            <el-tooltip :content="t('profiles.softDelete')" placement="top" :show-after="300">
+                                <el-button
+                                    size="small"
+                                    type="warning"
+                                    plain
+                                    :loading="row._busy"
+                                    @click="softDelete(row)"
+                                >
+                                    <el-icon><Delete /></el-icon>
+                                </el-button>
+                            </el-tooltip>
+                        </template>
+                        <template v-else>
+                            <el-tooltip :content="t('profiles.restore')" placement="top" :show-after="300">
+                                <el-button size="small" type="success" plain :loading="row._busy" @click="restore(row)">
+                                    <el-icon><RefreshRight /></el-icon>
+                                </el-button>
+                            </el-tooltip>
+                            <el-tooltip :content="t('profiles.hardDelete')" placement="top" :show-after="300">
+                                <el-button size="small" type="danger" plain :loading="row._busy" @click="hardDelete(row)">
+                                    <el-icon><Remove /></el-icon>
+                                </el-button>
+                            </el-tooltip>
+                        </template>
+                    </div>
                 </template>
             </el-table-column>
         </el-table>
@@ -216,6 +234,49 @@
             :ids="shareDialog.ids"
             :name="shareDialog.name"
         />
+
+        <el-dialog
+            v-model="editDialog.visible"
+            :title="t('profiles.edit')"
+            width="480px"
+            :close-on-click-modal="false"
+            append-to-body
+        >
+            <div style="padding: 4px 0">
+                <label
+                    style="display: block; font-size: 13px; color: #374151; margin-bottom: 6px; font-weight: 500"
+                >
+                    {{ t('profiles.name') }}
+                </label>
+                <el-input
+                    v-model="editDialog.name"
+                    maxlength="100"
+                    show-word-limit
+                    clearable
+                    autofocus
+                />
+
+                <label
+                    style="display: block; font-size: 13px; color: #374151; margin: 16px 0 6px; font-weight: 500"
+                >
+                    {{ t('profiles.group') }}
+                </label>
+                <el-select v-model="editDialog.groupId" filterable style="width: 100%">
+                    <el-option
+                        v-for="g in groups"
+                        :key="g.id"
+                        :label="g.name"
+                        :value="g.id"
+                    />
+                </el-select>
+            </div>
+            <template #footer>
+                <el-button @click="editDialog.visible = false">{{ t('common.cancel') }}</el-button>
+                <el-button type="primary" :loading="editDialog.saving" @click="submitEdit">
+                    {{ t('common.save') }}
+                </el-button>
+            </template>
+        </el-dialog>
 
         <div style="display: flex; justify-content: flex-end; margin-top: 16px">
             <el-pagination
@@ -256,9 +317,46 @@ const bulkBusy = ref(false);
 let searchTimer = null;
 
 const shareDialog = ref({ visible: false, ids: [], name: '' });
+const editDialog = ref({ visible: false, id: '', name: '', groupId: '', saving: false });
 
 function openShare(row) {
     shareDialog.value = { visible: true, ids: [row.id], name: row.name };
+}
+
+function openEdit(row) {
+    editDialog.value = {
+        visible: true,
+        id: row.id,
+        name: row.name,
+        groupId: row.group_id,
+        saving: false,
+    };
+}
+
+async function submitEdit() {
+    const name = (editDialog.value.name || '').trim();
+    if (!name) {
+        ElMessage.warning(t('profiles.nameRequired'));
+        return;
+    }
+    editDialog.value.saving = true;
+    try {
+        const { data } = await apiV1.post(`/profiles/update/${editDialog.value.id}`, {
+            name,
+            group_id: editDialog.value.groupId,
+        });
+        if (data?.success) {
+            ElMessage.success(t('common.success'));
+            editDialog.value.visible = false;
+            await fetchList();
+        } else {
+            ElMessage.error(data?.message || t('common.error'));
+        }
+    } catch (err) {
+        ElMessage.error(err?.response?.data?.message || t('common.error'));
+    } finally {
+        editDialog.value.saving = false;
+    }
 }
 
 function openBulkShare() {
@@ -559,3 +657,9 @@ onMounted(async () => {
     await fetchList();
 });
 </script>
+
+<style scoped>
+.profile-actions :deep(.el-button + .el-button) {
+    margin-left: 0;
+}
+</style>

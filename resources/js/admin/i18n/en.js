@@ -112,6 +112,8 @@ export default {
         selected: '{count} selected',
         empty: 'No profiles yet',
         emptyTrash: 'Trash is empty',
+        edit: 'Edit profile',
+        nameRequired: 'Please enter a name',
     },
     proxies: {
         rawProxy: 'Proxy',

@@ -112,6 +112,8 @@ export default {
         selected: 'Đã chọn {count}',
         empty: 'Chưa có profile nào',
         emptyTrash: 'Thùng rác trống',
+        edit: 'Sửa profile',
+        nameRequired: 'Vui lòng nhập tên',
     },
     proxies: {
         rawProxy: 'Proxy',
