@@ -4,7 +4,7 @@ import SystemSettings from './pages/SystemSettings.vue';
 import Users from './pages/Users.vue';
 import Groups from './pages/Groups.vue';
 import Profiles from './pages/Profiles.vue';
-import Placeholder from './pages/Placeholder.vue';
+import Proxies from './pages/Proxies.vue';
 
 const routes = [
     {
@@ -39,8 +39,8 @@ const routes = [
             {
                 path: 'proxies',
                 name: 'proxies',
-                component: Placeholder,
-                meta: { titleKey: 'menu.proxies', icon: 'Connection', phase: 4 },
+                component: Proxies,
+                meta: { titleKey: 'menu.proxies', icon: 'Connection' },
             },
         ],
     },
