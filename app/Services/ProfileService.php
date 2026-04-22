@@ -664,6 +664,10 @@ class ProfileService
                 $lastError = $result['message'];
             }
             $index++;
+            // v18: không tái sử dụng lại các giá trị cho profile khác nếu thiếu
+            if ($index >= $countArray) {
+                break;
+            }
         }
 
         $total = count(value: $profileIds);
