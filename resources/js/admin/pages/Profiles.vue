@@ -55,9 +55,43 @@
                 />
             </el-select>
 
+            <el-select
+                v-model="sort"
+                :placeholder="t('profiles.sort')"
+                style="width: 170px"
+                @change="reload(true)"
+            >
+                <el-option :label="t('profiles.sortCreatedDesc')" value="created_desc" />
+                <el-option :label="t('profiles.sortCreatedAsc')" value="created_asc" />
+                <el-option :label="t('profiles.sortNameAsc')" value="name_asc" />
+                <el-option :label="t('profiles.sortNameDesc')" value="name_desc" />
+            </el-select>
+
             <el-button @click="reload()">
                 <el-icon><Refresh /></el-icon>
             </el-button>
+
+            <el-popover placement="bottom-end" :width="200" trigger="click">
+                <template #reference>
+                    <el-button>
+                        <el-icon style="margin-right: 4px"><Setting /></el-icon>
+                        {{ t('profiles.columns') }}
+                    </el-button>
+                </template>
+                <el-checkbox-group
+                    v-model="activeColumns"
+                    style="display: flex; flex-direction: column; gap: 6px"
+                    @change="persistColumns"
+                >
+                    <el-checkbox value="group" :label="t('profiles.group')" />
+                    <el-checkbox value="tags" :label="t('profiles.tags')" />
+                    <el-checkbox value="status" :label="t('profiles.status')" />
+                    <el-checkbox value="usingBy" :label="t('profiles.usingBy')" />
+                    <el-checkbox value="storage" :label="t('profiles.storagePath')" />
+                    <el-checkbox value="size" :label="t('profiles.size')" />
+                    <el-checkbox value="time" :label="t('profiles.createdAt')" />
+                </el-checkbox-group>
+            </el-popover>
 
             <div style="flex: 1"></div>
 
@@ -114,12 +148,27 @@
                     </el-tooltip>
                 </template>
             </el-table-column>
-            <el-table-column :label="t('profiles.group')" min-width="140">
+            <el-table-column v-if="col('group')" :label="t('profiles.group')" min-width="140">
                 <template #default="{ row }">
                     <span>{{ row.group?.name || '—' }}</span>
                 </template>
             </el-table-column>
-            <el-table-column :label="t('profiles.status')" width="130">
+            <el-table-column v-if="col('tags')" :label="t('profiles.tags')" min-width="160">
+                <template #default="{ row }">
+                    <span v-if="!row.tags?.length" style="color: #9ca3af">—</span>
+                    <el-tag
+                        v-for="tag in row.tags"
+                        :key="tag.id"
+                        size="small"
+                        :style="tagStyle(tag)"
+                        disable-transitions
+                        style="margin: 2px 4px 2px 0"
+                    >
+                        {{ tag.name }}
+                    </el-tag>
+                </template>
+            </el-table-column>
+            <el-table-column v-if="col('status')" :label="t('profiles.status')" width="130">
                 <template #default="{ row }">
                     <el-tag
                         v-if="row.status === 1"
@@ -136,7 +185,7 @@
                     </el-tag>
                 </template>
             </el-table-column>
-            <el-table-column :label="t('profiles.usingBy')" min-width="170">
+            <el-table-column v-if="col('usingBy')" :label="t('profiles.usingBy')" min-width="170">
                 <template #default="{ row }">
                     <div v-if="row.current_user">
                         <div style="font-weight: 500">{{ row.current_user.display_name || '—' }}</div>
@@ -145,7 +194,7 @@
                     <span v-else style="color: #9ca3af">—</span>
                 </template>
             </el-table-column>
-            <el-table-column :label="t('profiles.storagePath')" width="130" align="center">
+            <el-table-column v-if="col('storage')" :label="t('profiles.storagePath')" width="130" align="center">
                 <template #default="{ row }">
                     <el-tooltip :content="row.storage_path || '—'" placement="top">
                         <el-tag size="small" :type="storageBadgeType(row)" disable-transitions>
@@ -154,13 +203,14 @@
                     </el-tooltip>
                 </template>
             </el-table-column>
-            <el-table-column :label="t('profiles.size')" width="120" align="right">
+            <el-table-column v-if="col('size')" :label="t('profiles.size')" width="120" align="right">
                 <template #default="{ row }">
                     <span v-if="sizes[row.id]">{{ formatBytes(sizes[row.id].bytes) }}</span>
                     <span v-else style="color: #9ca3af">—</span>
                 </template>
             </el-table-column>
             <el-table-column
+                v-if="col('time')"
                 :label="tab === 'trash' ? t('profiles.deletedAt') : t('profiles.createdAt')"
                 width="170"
             >
@@ -307,6 +357,7 @@ const rows = ref([]);
 const groups = ref([]);
 const search = ref('');
 const groupId = ref('');
+const sort = ref('created_desc');
 const tab = ref('active');
 const page = ref(1);
 const perPage = ref(20);
@@ -318,6 +369,33 @@ let searchTimer = null;
 
 const shareDialog = ref({ visible: false, ids: [], name: '' });
 const editDialog = ref({ visible: false, id: '', name: '', groupId: '', saving: false });
+
+const COLUMNS_STORAGE_KEY = 'admin_profiles_columns';
+const DEFAULT_COLUMNS = ['group', 'tags', 'status', 'usingBy', 'size'];
+
+function loadColumns() {
+    try {
+        const raw = localStorage.getItem(COLUMNS_STORAGE_KEY);
+        if (raw) return JSON.parse(raw);
+    } catch {
+        // ignore
+    }
+    return [...DEFAULT_COLUMNS];
+}
+
+const activeColumns = ref(loadColumns());
+
+function col(key) {
+    return activeColumns.value.includes(key);
+}
+
+function persistColumns() {
+    try {
+        localStorage.setItem(COLUMNS_STORAGE_KEY, JSON.stringify(activeColumns.value));
+    } catch {
+        // ignore
+    }
+}
 
 function openShare(row) {
     shareDialog.value = { visible: true, ids: [row.id], name: row.name };
@@ -396,6 +474,11 @@ function storageLabel(row) {
     return type || '—';
 }
 
+function tagStyle(tag) {
+    if (!tag?.color) return {};
+    return { backgroundColor: tag.color, color: '#fff', borderColor: tag.color };
+}
+
 function storageBadgeType(row) {
     if (row.storage_path && /^storage\/profiles\//i.test(row.storage_path)) return 'success';
     if ((row.storage_type || '').toUpperCase() === 'S3') return 'primary';
@@ -424,6 +507,7 @@ async function fetchList() {
                 page: page.value,
                 is_deleted: tab.value === 'trash' ? 1 : 0,
                 group_id: groupId.value || undefined,
+                sort: sort.value,
             },
         });
         if (data?.success) {
