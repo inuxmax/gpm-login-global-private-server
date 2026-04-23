@@ -182,7 +182,15 @@ class ProfileController extends BaseController
         }
 
         $profile_ids = $request->profile_ids ?? $request->ids ?? [];
-        $result = $this->profileService->bulkEditProperty($profile_ids, $request->field_name, $new_value);
+        // Fix bug v18 update group_id
+        $is_cycling_values = $request->is_cycling_values ?? true;
+        
+        $result = $this->profileService->bulkEditProperty(
+            $profile_ids,
+            $request->field_name,
+            $new_value,
+            $is_cycling_values
+        );
         return $this->getJsonResponse($result['success'], $result['message'], $result['data']);
     }
 

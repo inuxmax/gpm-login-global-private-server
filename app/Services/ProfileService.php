@@ -643,7 +643,11 @@ class ProfileService
 
 
 
-    public function bulkEditProperty(array $profileIds, string $fieldName, ?string $newValue)
+    public function bulkEditProperty(
+        array $profileIds,
+        string $fieldName,
+        ?string $newValue,
+        bool $isCyclingValues = true)
     {
         $count = 0;
         $lastError = null;
@@ -665,7 +669,9 @@ class ProfileService
             }
             $index++;
             // v18: không tái sử dụng lại các giá trị cho profile khác nếu thiếu
-            if ($index >= $countArray) {
+            // -> Bug update group_id -> thêm option isCyclingValues
+            if ($isCyclingValues == false
+                && $index >= $countArray) {
                 break;
             }
         }
