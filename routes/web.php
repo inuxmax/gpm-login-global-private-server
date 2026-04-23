@@ -6,6 +6,10 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminApiController;
 use App\Http\Controllers\UpdateController;
+use App\Http\Controllers\Api\GroupController;
+use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\ProxyController;
+use App\Http\Controllers\Api\UserController as ApiUserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -73,7 +77,62 @@ Route::middleware(['admin.only'])->group(function () {
 
         Route::post('/logout', [AdminApiController::class, 'logout']);
 
-        // Admin-only filesystem lookups (SPA uses /api/profiles for CRUD)
+        // User picker for ShareDialog (paginated active users) — reuses Api\UserController
+        Route::get('/user-search', [ApiUserController::class, 'index']);
+
+        // Admin-only filesystem lookups. Must come BEFORE the /profiles/{id}
+        // route registered below, otherwise Laravel matches "storage-sizes" as {id}.
         Route::get('/profiles/storage-sizes', [AdminApiController::class, 'profileStorageSizes']);
+
+        // --------------------------------------------------------------------
+        // Re-mount existing Api\* controllers for the admin SPA.
+        // Same controllers as routes/api.php — session auth via admin.only
+        // instead of Sanctum, so desktop-app Bearer tokens are untouched and
+        // we no longer need SANCTUM_STATEFUL_DOMAINS=* for the SPA.
+        // --------------------------------------------------------------------
+
+        Route::prefix('groups')->group(function () {
+            Route::get('/', [GroupController::class, 'index']);
+            Route::get('/count', [GroupController::class, 'getTotal']);
+            Route::post('/create', [GroupController::class, 'store']);
+            Route::post('/update/{id}', [GroupController::class, 'update']);
+            Route::post('/delete/{id}', [GroupController::class, 'destroy']);
+            Route::post('/share/{id}', [GroupController::class, 'share']);
+            Route::post('/remove-share/{id}', [GroupController::class, 'removeShare']);
+            Route::get('/get-share-users/{id}', [GroupController::class, 'getGroupShareUsers']);
+            Route::get('/{id}', [GroupController::class, 'show']);
+        });
+
+        Route::prefix('profiles')->group(function () {
+            Route::get('/', [ProfileController::class, 'index']);
+            Route::get('/count', [ProfileController::class, 'getTotal']);
+            Route::post('/create', [ProfileController::class, 'store']);
+            Route::post('/update/{id}', [ProfileController::class, 'update']);
+            Route::post('/bulk-edit-property', [ProfileController::class, 'bulkEditProperty']);
+            Route::post('/delete/{id}', [ProfileController::class, 'destroy']);
+            Route::post('/bulk-delete', [ProfileController::class, 'bulkDelete']);
+            Route::post('/share/{id}', [ProfileController::class, 'share']);
+            Route::post('/remove-share/{id}', [ProfileController::class, 'removeShare']);
+            Route::post('/bulk-share', [ProfileController::class, 'bulkShare']);
+            Route::post('/bulk-remove-share', [ProfileController::class, 'bulkRemoveShare']);
+            Route::post('/update-status/{id}', [ProfileController::class, 'updateStatus']);
+            Route::post('/restore/{id}', [ProfileController::class, 'restore']);
+            Route::post('/bulk-restore', [ProfileController::class, 'bulkRestore']);
+            Route::get('/get-share-users/{id}', [ProfileController::class, 'getProfileShareUsers']);
+            Route::get('/{id}', [ProfileController::class, 'show']);
+        });
+
+        Route::prefix('proxies')->group(function () {
+            Route::get('/', [ProxyController::class, 'index']);
+            Route::post('/bulk-create', [ProxyController::class, 'bulkStore']);
+            Route::post('/update/{id}', [ProxyController::class, 'update']);
+            Route::post('/delete/{id}', [ProxyController::class, 'destroy']);
+            Route::post('/bulk-delete', [ProxyController::class, 'bulkDelete']);
+            Route::post('/bulk-share', [ProxyController::class, 'bulkShare']);
+            Route::post('/remove-share/{id}', [ProxyController::class, 'removeShare']);
+            Route::post('/bulk-remove-share', [ProxyController::class, 'bulkRemoveShare']);
+            Route::get('/get-share-users/{id}', [ProxyController::class, 'getProxyShareUsers']);
+            Route::get('/{id}', [ProxyController::class, 'show']);
+        });
     });
 });

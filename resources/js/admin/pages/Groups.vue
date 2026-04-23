@@ -149,7 +149,7 @@
 import { onMounted, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { ElMessage, ElMessageBox } from 'element-plus';
-import { apiV1 } from '../api/http';
+import { http } from '../api/http';
 import ShareDialog from '../components/ShareDialog.vue';
 
 const { t } = useI18n();
@@ -203,7 +203,7 @@ function formatTime(value) {
 async function fetchGroups() {
     loading.value = true;
     try {
-        const { data } = await apiV1.get('/groups', {
+        const { data } = await http.get('/groups', {
             params: { search: search.value, per_page: perPage.value, page: page.value },
         });
         if (data?.success) {
@@ -255,7 +255,7 @@ async function submitDialog() {
         const url = dialog.mode === 'create'
             ? '/groups/create'
             : `/groups/update/${dialog.form.id}`;
-        const { data } = await apiV1.post(url, payload);
+        const { data } = await http.post(url, payload);
         if (data?.success) {
             ElMessage.success(t('common.success'));
             dialog.visible = false;
@@ -283,7 +283,7 @@ async function deleteGroup(row) {
 
     row._deleting = true;
     try {
-        const { data } = await apiV1.post(`/groups/delete/${row.id}`);
+        const { data } = await http.post(`/groups/delete/${row.id}`);
         if (data?.success) {
             ElMessage.success(t('common.success'));
             if (rows.value.length === 1 && page.value > 1) page.value -= 1;

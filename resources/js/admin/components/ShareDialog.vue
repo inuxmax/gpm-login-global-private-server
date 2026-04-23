@@ -94,7 +94,7 @@
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { ElMessage, ElMessageBox } from 'element-plus';
-import { apiV1 } from '../api/http';
+import { http } from '../api/http';
 
 const props = defineProps({
     modelValue: { type: Boolean, default: false },
@@ -144,16 +144,17 @@ function roleTagType(role) {
     return 'info';
 }
 
+const PREFIX = { group: 'groups', profile: 'profiles', proxy: 'proxies' };
+
 function endpointList() {
-    // `${type}s` → groups, profiles, proxies
-    return `/${props.type}s/get-share-users/${idList.value[0]}`;
+    return `/${PREFIX[props.type]}/get-share-users/${idList.value[0]}`;
 }
 
 async function loadShares() {
     if (!isSingle.value) return;
     loadingShares.value = true;
     try {
-        const { data } = await apiV1.get(endpointList());
+        const { data } = await http.get(endpointList());
         if (data?.success) {
             const payload = data.data;
             // Laravel paginator or plain array — normalize
@@ -172,7 +173,7 @@ function searchUsers(query) {
     userSearchTimer = setTimeout(async () => {
         userSearching.value = true;
         try {
-            const { data } = await apiV1.get('/users', { params: { search: query || '', per_page: 20 } });
+            const { data } = await http.get('/user-search', { params: { search: query || '', per_page: 20 } });
             if (data?.success) {
                 const payload = data.data;
                 const list = Array.isArray(payload) ? payload : (payload?.data || []);
@@ -198,7 +199,7 @@ async function addShare() {
     try {
         const url = buildShareUrl();
         const payload = buildSharePayload();
-        const { data } = await apiV1.post(url, payload);
+        const { data } = await http.post(url, payload);
 
         if (data?.success) {
             ElMessage.success(t('common.success'));
@@ -258,7 +259,7 @@ async function removeShare(share) {
     try {
         const url = buildRemoveUrl();
         const payload = buildRemovePayload(share.id);
-        const { data } = await apiV1.post(url, payload);
+        const { data } = await http.post(url, payload);
 
         if (data?.success) {
             ElMessage.success(t('common.success'));
@@ -275,8 +276,8 @@ async function removeShare(share) {
 }
 
 function buildRemoveUrl() {
-    // All single-row removes use the /{type}s/remove-share/{id} pattern
-    return `/${props.type}s/remove-share/${idList.value[0]}`;
+    // All single-row removes use the /{prefix}/remove-share/{id} pattern
+    return `/${PREFIX[props.type]}/remove-share/${idList.value[0]}`;
 }
 
 function buildRemovePayload(userId) {

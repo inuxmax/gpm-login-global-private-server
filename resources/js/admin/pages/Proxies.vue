@@ -204,7 +204,7 @@
 import { onMounted, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { ElMessage, ElMessageBox } from 'element-plus';
-import { apiV1 } from '../api/http';
+import { http } from '../api/http';
 import ShareDialog from '../components/ShareDialog.vue';
 
 const { t } = useI18n();
@@ -295,7 +295,7 @@ async function fetchList() {
     loading.value = true;
     selection.value = [];
     try {
-        const { data } = await apiV1.get('/proxies', {
+        const { data } = await http.get('/proxies', {
             params: { search: search.value, per_page: perPage.value, page: page.value },
         });
         if (data?.success) {
@@ -344,7 +344,7 @@ async function submitAdd() {
     addDialog.saving = true;
     try {
         const proxies = lines.map((raw) => ({ raw_proxy: raw }));
-        const { data } = await apiV1.post('/proxies/bulk-create', { proxies });
+        const { data } = await http.post('/proxies/bulk-create', { proxies });
         if (data?.success) {
             ElMessage.success(t('proxies.addedCount', { count: lines.length }));
             addDialog.visible = false;
@@ -373,7 +373,7 @@ async function submitEdit() {
     }
     editDialog.saving = true;
     try {
-        const { data } = await apiV1.post(`/proxies/update/${editDialog.id}`, { raw_proxy: raw });
+        const { data } = await http.post(`/proxies/update/${editDialog.id}`, { raw_proxy: raw });
         if (data?.success) {
             ElMessage.success(t('common.success'));
             editDialog.visible = false;
@@ -400,7 +400,7 @@ async function deleteRow(row) {
     }
     row._busy = true;
     try {
-        const { data } = await apiV1.post(`/proxies/delete/${row.id}`);
+        const { data } = await http.post(`/proxies/delete/${row.id}`);
         if (data?.success) {
             ElMessage.success(t('common.success'));
             if (rows.value.length === 1 && page.value > 1) page.value -= 1;
@@ -429,7 +429,7 @@ async function bulkDelete() {
     }
     bulkBusy.value = true;
     try {
-        const { data } = await apiV1.post('/proxies/bulk-delete', { proxy_ids: ids });
+        const { data } = await http.post('/proxies/bulk-delete', { proxy_ids: ids });
         if (data?.success) {
             ElMessage.success(t('common.success'));
             await fetchList();

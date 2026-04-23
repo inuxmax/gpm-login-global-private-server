@@ -297,7 +297,7 @@
 import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { ElMessage, ElMessageBox } from 'element-plus';
-import { apiV1, http } from '../api/http';
+import { http } from '../api/http';
 import ShareDialog from '../components/ShareDialog.vue';
 
 const { t } = useI18n();
@@ -341,7 +341,7 @@ async function submitEdit() {
     }
     editDialog.value.saving = true;
     try {
-        const { data } = await apiV1.post(`/profiles/update/${editDialog.value.id}`, {
+        const { data } = await http.post(`/profiles/update/${editDialog.value.id}`, {
             name,
             group_id: editDialog.value.groupId,
         });
@@ -404,7 +404,7 @@ function storageBadgeType(row) {
 
 async function fetchGroups() {
     try {
-        const { data } = await apiV1.get('/groups', { params: { per_page: 500 } });
+        const { data } = await http.get('/groups', { params: { per_page: 500 } });
         if (data?.success) {
             groups.value = data.data?.data || [];
         }
@@ -417,7 +417,7 @@ async function fetchList() {
     loading.value = true;
     selection.value = [];
     try {
-        const { data } = await apiV1.get('/profiles', {
+        const { data } = await http.get('/profiles', {
             params: {
                 search: search.value,
                 per_page: perPage.value,
@@ -496,7 +496,7 @@ async function resetStatus(row) {
     }
     row._busy = true;
     try {
-        const { data } = await apiV1.post(`/profiles/update-status/${row.id}`, { status: 1 });
+        const { data } = await http.post(`/profiles/update-status/${row.id}`, { status: 1 });
         if (data?.success) {
             ElMessage.success(t('common.success'));
             row.status = 1;
@@ -524,7 +524,7 @@ async function softDelete(row) {
     }
     row._busy = true;
     try {
-        const { data } = await apiV1.post(`/profiles/delete/${row.id}`, { mode: 'soft' });
+        const { data } = await http.post(`/profiles/delete/${row.id}`, { mode: 'soft' });
         if (data?.success) {
             ElMessage.success(t('common.success'));
             await fetchList();
@@ -550,7 +550,7 @@ async function hardDelete(row) {
     }
     row._busy = true;
     try {
-        const { data } = await apiV1.post(`/profiles/delete/${row.id}`, { mode: 'hard' });
+        const { data } = await http.post(`/profiles/delete/${row.id}`, { mode: 'hard' });
         if (data?.success) {
             ElMessage.success(t('common.success'));
             await fetchList();
@@ -576,7 +576,7 @@ async function restore(row) {
     }
     row._busy = true;
     try {
-        const { data } = await apiV1.post(`/profiles/restore/${row.id}`);
+        const { data } = await http.post(`/profiles/restore/${row.id}`);
         if (data?.success) {
             ElMessage.success(t('common.success'));
             await fetchList();
@@ -638,7 +638,7 @@ async function bulkRestore() {
 async function bulkAction(url, payload) {
     bulkBusy.value = true;
     try {
-        const { data } = await apiV1.post(url, payload);
+        const { data } = await http.post(url, payload);
         if (data?.success) {
             ElMessage.success(t('common.success'));
             await fetchList();
