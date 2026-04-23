@@ -18,3 +18,4 @@ yarn-error.log
 phpunit.xml
 latest.zip
 latest-update.zip
+.claude/*.local.json

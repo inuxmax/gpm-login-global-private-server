@@ -1,47 +1,126 @@
-FROM php:8.1-apache
+# syntax=docker/dockerfile:1.6
+#
+# Multi-stage build for gpm-login-global-private-server.
+#
+# - Stage 1 (node-builder)     : compile Vue 3 SPA (public/build/*)
+# - Stage 2 (composer-builder) : install PHP deps (vendor/)
+# - Stage 3 (runtime)          : slim PHP/Apache image serving the app
+#
+# Both builder stages run on the native BUILDPLATFORM to avoid slow QEMU
+# emulation on multi-arch builds. Their artifacts (JS/CSS + PHP autoload)
+# are architecture-independent, so only the final runtime stage is built
+# per TARGETPLATFORM by buildx.
+#
+# Build & publish multi-arch:
+#   docker buildx build --platform linux/amd64,linux/arm64 \
+#       -t ngochoaitn/gpm-login-global-private-server:latest --push .
+#
 
-# Cài đặt các dependencies cần thiết
-RUN apt-get update && apt-get install -y \
-    libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
-    zip \
-    unzip \
-    nano \
-    curl \
-    git \
+# -----------------------------------------------------------------------------
+# Stage 1 — Vue SPA bundle
+# -----------------------------------------------------------------------------
+FROM --platform=$BUILDPLATFORM node:20-alpine AS node-builder
+
+WORKDIR /app
+
+# Install FE deps first (cache-friendly)
+COPY package.json package-lock.json* ./
+RUN if [ -f package-lock.json ]; then \
+        npm ci --no-audit --no-fund; \
+    else \
+        npm install --no-audit --no-fund; \
+    fi
+
+# Copy only what Vite needs
+COPY vite.config.js tailwind.config.js postcss.config.js ./
+COPY resources ./resources
+COPY public ./public
+
+RUN npm run build
+
+
+# -----------------------------------------------------------------------------
+# Stage 2 — PHP dependencies (composer)
+#
+# Must run under PHP 8.1 because composer.lock pins packages that require
+# php <=8.4 (nette/schema, nette/utils). The official composer:* image ships
+# with PHP 8.5+ which refuses to resolve. We bring composer into a php:8.1-cli
+# image instead.
+# -----------------------------------------------------------------------------
+FROM --platform=$BUILDPLATFORM php:8.1-cli-alpine AS composer-builder
+
+RUN apk add --no-cache git unzip libzip-dev \
+    && docker-php-ext-install zip
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+WORKDIR /app
+
+# Prime the package cache with composer metadata only (better layer caching)
+COPY composer.json composer.lock ./
+RUN composer install \
+        --no-dev \
+        --no-scripts \
+        --no-autoloader \
+        --prefer-dist \
+        --no-interaction \
+        --no-progress
+
+# Copy the rest of the Laravel source and finalise the autoloader
+COPY . .
+RUN composer dump-autoload --no-dev --optimize --classmap-authoritative
+
+
+# -----------------------------------------------------------------------------
+# Stage 3 — Runtime (per-target PHP/Apache)
+# -----------------------------------------------------------------------------
+FROM php:8.1-apache AS runtime
+
+# PHP native extensions + build tools (cleaned up in the same layer)
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        libpng-dev \
+        libjpeg-dev \
+        libfreetype6-dev \
+        libzip-dev \
+        zip \
+        unzip \
+        curl \
+        git \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_mysql exif fileinfo
+    && docker-php-ext-install -j"$(nproc)" gd pdo pdo_mysql exif fileinfo zip \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Cài đặt Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-# Copy file source Laravel vào container
-COPY . /var/www/html
 WORKDIR /var/www/html
 
-RUN mkdir -p storage/app/public/profiles
+# Application code + composer-installed vendor/
+COPY --from=composer-builder /app /var/www/html
 
-# Cấp quyền ghi cho storage và bootstrap/cache
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
+# Overwrite/ensure public/build is the freshly compiled SPA bundle
+COPY --from=node-builder /app/public/build /var/www/html/public/build
+
+# Runtime config (Apache vhost, PHP ini, entrypoint)
+COPY docker/apache/000-default.conf /etc/apache2/sites-available/000-default.conf
+COPY docker/php/php_large_file_upload.ini /usr/local/etc/php/conf.d/php_large_file_upload.ini
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+
+RUN a2enmod rewrite \
+    && chmod +x /usr/local/bin/entrypoint.sh \
+    && mkdir -p \
+        storage/app/public/profiles \
+        storage/framework/cache \
+        storage/framework/sessions \
+        storage/framework/testing \
+        storage/framework/views \
+        storage/logs \
+        bootstrap/cache \
+    && chown -R www-data:www-data /var/www/html \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
-    
-RUN chown -R www-data:www-data /var/www/html
-# # Thiết lập quyền truy cập
-# RUN chown -R www-data:www-data /var/www \
-#     && chmod -R 775 /var/www/storage \
-#     && chmod -R 775 /var/www/bootstrap/cache
 
-# Kích hoạt mod_rewrite
-RUN a2enmod rewrite
-
-# Expose cổng 80
 EXPOSE 80
 
-RUN rm -rf public/storage
-RUN php artisan storage:link
-RUN php artisan key:generate
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -fsS http://localhost/ >/dev/null || exit 1
 
-RUN chmod 777 /var/www/html/.env
-
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["apache2-foreground"]
