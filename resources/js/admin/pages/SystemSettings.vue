@@ -120,6 +120,19 @@
                     <el-icon style="margin-right: 4px"><Upload /></el-icon>
                     {{ t('settings.autoUpdate') }}
                 </el-button>
+
+                <el-upload
+                    ref="uploadRef"
+                    :auto-upload="false"
+                    :show-file-list="false"
+                    accept=".zip"
+                    :on-change="onUpdateFileSelected"
+                >
+                    <el-button type="primary" plain :loading="uploadingUpdate">
+                        <el-icon style="margin-right: 4px"><UploadFilled /></el-icon>
+                        {{ t('settings.uploadUpdate') }}
+                    </el-button>
+                </el-upload>
             </div>
         </div>
     </div>
@@ -149,6 +162,8 @@ const resettingStatus = ref(false);
 const migrating = ref(false);
 const customRegion = ref(false);
 const showCacheDetails = ref(false);
+const uploadingUpdate = ref(false);
+const uploadRef = ref(null);
 
 const form = reactive({
     storage_type: 'local',
@@ -245,6 +260,50 @@ async function autoUpdate() {
     }
     // Auto-update page is a GET endpoint that streams its own response — open it.
     window.open(`${config.baseUrl}/auto-update`, '_blank');
+}
+
+async function onUpdateFileSelected(uploadFile) {
+    const file = uploadFile?.raw;
+    uploadRef.value?.clearFiles();
+    if (!file) return;
+
+    const isZip =
+        file.type === 'application/zip' ||
+        file.type === 'application/x-zip-compressed' ||
+        /\.zip$/i.test(file.name);
+    if (!isZip) {
+        ElMessage.error(t('settings.uploadUpdateNotZip'));
+        return;
+    }
+
+    try {
+        await ElMessageBox.confirm(
+            t('settings.uploadUpdateConfirm', { name: file.name }),
+            t('common.confirm'),
+            { type: 'warning' }
+        );
+    } catch {
+        return;
+    }
+
+    uploadingUpdate.value = true;
+    try {
+        const formData = new FormData();
+        formData.append('file', file);
+        const { data } = await http.post('/upload-update', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+            timeout: 0,
+        });
+        if (data?.success) {
+            ElMessage.success(data.message || t('common.success'));
+        } else {
+            ElMessage.error(data?.message || t('common.error'));
+        }
+    } catch (err) {
+        ElMessage.error(err?.response?.data?.message || t('common.error'));
+    } finally {
+        uploadingUpdate.value = false;
+    }
 }
 
 onMounted(fetchSettings);

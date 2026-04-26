@@ -82,6 +82,9 @@ export default {
         runMigrationConfirm: 'Run database migration now?',
         autoUpdate: 'Update private server',
         autoUpdateConfirm: 'Proceed with private server auto-update?',
+        uploadUpdate: 'Upload update package',
+        uploadUpdateConfirm: 'Apply the update from "{name}"? Source code will be overwritten and migrations will run.',
+        uploadUpdateNotZip: 'Please select a valid .zip file',
     },
     profiles: {
         tabActive: 'Active',

@@ -76,6 +76,7 @@ Route::middleware(['admin.only'])->group(function () {
 
         Route::post('/reset-profile-status', [AdminApiController::class, 'resetProfileStatus']);
         Route::post('/run-migrations', [AdminApiController::class, 'runMigrations']);
+        Route::post('/upload-update', [UpdateController::class, 'uploadAndUpdate']);
 
         Route::post('/logout', [AdminApiController::class, 'logout']);
 

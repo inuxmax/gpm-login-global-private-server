@@ -82,6 +82,9 @@ export default {
         runMigrationConfirm: '立即执行数据库迁移？',
         autoUpdate: '更新私有服务器',
         autoUpdateConfirm: '继续自动更新私有服务器？',
+        uploadUpdate: '上传更新包',
+        uploadUpdateConfirm: '使用 "{name}" 应用更新？源代码将被覆盖并执行数据库迁移。',
+        uploadUpdateNotZip: '请选择有效的 .zip 文件',
     },
     profiles: {
         tabActive: '活跃',

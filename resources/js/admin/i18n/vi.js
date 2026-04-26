@@ -82,6 +82,9 @@ export default {
         runMigrationConfirm: 'Chạy migration database?',
         autoUpdate: 'Cập nhật private server',
         autoUpdateConfirm: 'Tiến hành cập nhật private server?',
+        uploadUpdate: 'Tải lên tệp cập nhật',
+        uploadUpdateConfirm: 'Áp dụng cập nhật từ tệp "{name}"? Mã nguồn sẽ bị ghi đè và database sẽ được migrate.',
+        uploadUpdateNotZip: 'Vui lòng chọn tệp .zip hợp lệ',
     },
     profiles: {
         tabActive: 'Đang hoạt động',
