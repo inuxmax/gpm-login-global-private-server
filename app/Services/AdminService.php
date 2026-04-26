@@ -177,7 +177,10 @@ class AdminService
     public function runMigrations()
     {
         try {
-            $result = \App\Http\Controllers\UpdateController::migrationDatabase();
+            // Call MigrationService directly so this path doesn't depend on
+            // UpdateService.php / UpdateController.php (both excluded from
+            // auto-update zips — see create-zip-file.py).
+            $result = (new \App\Services\MigrationService())->migrationDatabase();
             return [
                 'success' => true,
                 'message' => 'ok',
