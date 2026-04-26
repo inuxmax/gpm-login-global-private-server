@@ -45,6 +45,7 @@ class AdminApiController extends Controller
         $storageType = $this->settingService->get('storage_type', 'local');
         $s3 = $this->settingService->getS3Config();
         $cacheExt = $this->settingService->get('cache_extension', 'off');
+        $writeLog = $this->settingService->get('write_log', 'off');
 
         return response()->json([
             'success' => true,
@@ -57,6 +58,7 @@ class AdminApiController extends Controller
                     'S3_REGION' => $s3->S3_REGION,
                 ],
                 'cache_extension' => $cacheExt,
+                'write_log' => $writeLog,
                 'server_version' => SettingService::$server_version,
             ],
         ]);
@@ -70,7 +72,8 @@ class AdminApiController extends Controller
             $request->input('S3_PASSWORD'),
             $request->input('S3_BUCKET'),
             $request->input('S3_REGION'),
-            $request->boolean('cache_extension') ? 'on' : 'off'
+            $request->boolean('cache_extension') ? 'on' : 'off',
+            $request->boolean('write_log') ? 'on' : 'off'
         );
 
         return response()->json(['success' => true, 'message' => $message]);

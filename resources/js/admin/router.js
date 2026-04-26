@@ -5,6 +5,7 @@ import Users from './pages/Users.vue';
 import Groups from './pages/Groups.vue';
 import Profiles from './pages/Profiles.vue';
 import Proxies from './pages/Proxies.vue';
+import Logs from './pages/Logs.vue';
 
 const routes = [
     {
@@ -41,6 +42,12 @@ const routes = [
                 name: 'proxies',
                 component: Proxies,
                 meta: { titleKey: 'menu.proxies', icon: 'Connection' },
+            },
+            {
+                path: 'logs',
+                name: 'logs',
+                component: Logs,
+                meta: { titleKey: 'menu.logs', icon: 'Document' },
             },
         ],
     },

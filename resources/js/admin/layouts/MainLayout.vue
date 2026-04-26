@@ -39,6 +39,10 @@
                     <el-icon><Connection /></el-icon>
                     <span>{{ t('menu.proxies') }}</span>
                 </el-menu-item>
+                <el-menu-item index="/admin/app/logs">
+                    <el-icon><Document /></el-icon>
+                    <span>{{ t('menu.logs') }}</span>
+                </el-menu-item>
             </el-menu>
 
             <div style="flex: 1"></div>

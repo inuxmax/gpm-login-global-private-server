@@ -73,6 +73,12 @@
                     </el-tooltip>
                 </el-form-item>
 
+                <el-form-item>
+                    <el-checkbox v-model="form.write_log">
+                        {{ t('settings.writeLog') }}
+                    </el-checkbox>
+                </el-form-item>
+
                 <el-alert
                     v-if="showCacheDetails"
                     type="info"
@@ -148,6 +154,7 @@ const form = reactive({
     storage_type: 'local',
     s3: { S3_KEY: '', S3_PASSWORD: '', S3_BUCKET: '', S3_REGION: '' },
     cache_extension: false,
+    write_log: false,
 });
 
 async function fetchSettings() {
@@ -158,6 +165,7 @@ async function fetchSettings() {
             form.storage_type = data.data.storage_type;
             form.s3 = { ...form.s3, ...(data.data.s3 || {}) };
             form.cache_extension = data.data.cache_extension === 'on';
+            form.write_log = data.data.write_log === 'on';
             customRegion.value = !!form.s3.S3_REGION && !standardRegions.includes(form.s3.S3_REGION);
         }
     } catch (err) {
@@ -173,6 +181,7 @@ async function save() {
         const payload = {
             storage_type: form.storage_type,
             cache_extension: form.cache_extension,
+            write_log: form.write_log,
             S3_KEY: form.s3.S3_KEY,
             S3_PASSWORD: form.s3.S3_PASSWORD,
             S3_BUCKET: form.s3.S3_BUCKET,
