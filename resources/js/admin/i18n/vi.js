@@ -13,6 +13,7 @@ export default {
         profiles: 'Quản lý profiles',
         proxies: 'Quản lý proxy',
         logs: 'Nhật ký',
+        systemLogs: 'Log hệ thống',
     },
     share: {
         title: 'Chia sẻ',
@@ -179,6 +180,16 @@ export default {
         deleteAllConfirm: 'Xoá tất cả nhật ký theo bộ lọc hiện tại? Hành động không thể hoàn tác.',
         deletedCount: 'Đã xoá {count} nhật ký',
         empty: 'Chưa có nhật ký nào',
+    },
+    systemLogs: {
+        title: 'Log hệ thống Laravel',
+        levelAll: 'Tất cả mức',
+        linesLabel: '{count} dòng cuối',
+        clear: 'Xoá file log',
+        clearConfirm: 'Xoá toàn bộ nội dung file laravel.log? Hành động không thể hoàn tác.',
+        truncatedNotice:
+            'File log lớn hơn giới hạn — chỉ đang đọc 2MB cuối. Hãy xoá file hoặc tải xuống nếu cần xem toàn bộ.',
+        showRaw: 'Xem raw / stack trace',
     },
     users: {
         title: 'Quản lý người dùng',

@@ -43,6 +43,10 @@
                     <el-icon><Document /></el-icon>
                     <span>{{ t('menu.logs') }}</span>
                 </el-menu-item>
+                <el-menu-item index="/admin/app/system-logs">
+                    <el-icon><Tickets /></el-icon>
+                    <span>{{ t('menu.systemLogs') }}</span>
+                </el-menu-item>
             </el-menu>
 
             <div style="flex: 1"></div>

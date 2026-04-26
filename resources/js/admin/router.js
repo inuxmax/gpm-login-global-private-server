@@ -6,6 +6,7 @@ import Groups from './pages/Groups.vue';
 import Profiles from './pages/Profiles.vue';
 import Proxies from './pages/Proxies.vue';
 import Logs from './pages/Logs.vue';
+import SystemLogs from './pages/SystemLogs.vue';
 
 const routes = [
     {
@@ -48,6 +49,12 @@ const routes = [
                 name: 'logs',
                 component: Logs,
                 meta: { titleKey: 'menu.logs', icon: 'Document' },
+            },
+            {
+                path: 'system-logs',
+                name: 'system-logs',
+                component: SystemLogs,
+                meta: { titleKey: 'menu.systemLogs', icon: 'Tickets' },
             },
         ],
     },

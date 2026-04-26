@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminApiController;
 use App\Http\Controllers\LogController;
+use App\Http\Controllers\SystemLogController;
 use App\Http\Controllers\UpdateController;
 use App\Http\Controllers\Api\GroupController;
 use App\Http\Controllers\Api\ProfileController;
@@ -82,6 +83,11 @@ Route::middleware(['admin.only'])->group(function () {
             Route::get('/', [LogController::class, 'index']);
             Route::post('/delete-all', [LogController::class, 'destroyAll']);
             Route::post('/{id}/delete', [LogController::class, 'destroy']);
+        });
+
+        Route::prefix('system-logs')->group(function () {
+            Route::get('/', [SystemLogController::class, 'index']);
+            Route::post('/clear', [SystemLogController::class, 'clear']);
         });
 
         // User picker for ShareDialog (paginated active users) — reuses Api\UserController

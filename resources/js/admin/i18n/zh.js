@@ -13,6 +13,7 @@ export default {
         profiles: '配置文件',
         proxies: '代理管理',
         logs: '日志',
+        systemLogs: '系统日志',
     },
     share: {
         title: '共享',
@@ -179,6 +180,16 @@ export default {
         deleteAllConfirm: '按当前筛选条件删除全部日志？此操作不可撤销。',
         deletedCount: '已删除 {count} 条日志',
         empty: '暂无日志',
+    },
+    systemLogs: {
+        title: 'Laravel 系统日志',
+        levelAll: '全部级别',
+        linesLabel: '最后 {count} 行',
+        clear: '清空日志文件',
+        clearConfirm: '清空整个 laravel.log 文件？此操作不可撤销。',
+        truncatedNotice:
+            '日志文件超过读取上限 —— 仅显示最后 2MB。如需查看全部内容请清空或下载文件。',
+        showRaw: '查看原始 / 堆栈',
     },
     users: {
         title: '用户管理',

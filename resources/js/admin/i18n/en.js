@@ -13,6 +13,7 @@ export default {
         profiles: 'Profiles',
         proxies: 'Proxies',
         logs: 'Logs',
+        systemLogs: 'System logs',
     },
     share: {
         title: 'Share',
@@ -179,6 +180,16 @@ export default {
         deleteAllConfirm: 'Delete all logs matching the current filters? This cannot be undone.',
         deletedCount: 'Deleted {count} logs',
         empty: 'No logs yet',
+    },
+    systemLogs: {
+        title: 'Laravel system log',
+        levelAll: 'All levels',
+        linesLabel: 'Last {count} lines',
+        clear: 'Clear file',
+        clearConfirm: 'Truncate the entire laravel.log file? This cannot be undone.',
+        truncatedNotice:
+            'Log file is larger than the read limit — only the last 2MB is shown. Clear or download the file for full access.',
+        showRaw: 'Show raw / stack trace',
     },
     users: {
         title: 'User management',
