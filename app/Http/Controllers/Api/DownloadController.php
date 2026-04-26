@@ -33,14 +33,15 @@ class DownloadController extends BaseController
 
         $etag = md5_file($fullPath);
 
-        if (pathinfo($file, PATHINFO_EXTENSION) === '') {
+        if (pathinfo($file, PATHINFO_EXTENSION) === ''
+                && strlen($file) === 36) {
             $profileId = $file;
 
             $this->logService->create(
                 $profileId,
                 'profiles',
                 LogModel::TYPE_INFO,
-                "download profile file: {$file}, egtag: {$etag}"
+                "download profile file: {$file}, etag: {$etag}"
             );
         }
 

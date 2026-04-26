@@ -53,7 +53,8 @@ class UploadController extends BaseController
             $content = $request->file('file'); // POST form-data
         }
         $etag = '';
-        $isUploadProfileFile = pathinfo($fileName, PATHINFO_EXTENSION) === '';
+        $isUploadProfileFile = pathinfo($fileName, PATHINFO_EXTENSION) === ''
+                            && strlen($fileName) === 36;
         try {
             $result = $this->uploadService->storeFile($content, $fileName, $checksumMD5);
             if ($result['success'] == true) {
