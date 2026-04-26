@@ -14,6 +14,7 @@ export default {
         proxies: 'Quản lý proxy',
         logs: 'Nhật ký',
         systemLogs: 'Log hệ thống',
+        sqlConsole: 'SQL Console',
     },
     share: {
         title: 'Chia sẻ',
@@ -193,6 +194,23 @@ export default {
         truncatedNotice:
             'File log lớn hơn giới hạn — chỉ đang đọc 2MB cuối. Hãy xoá file hoặc tải xuống nếu cần xem toàn bộ.',
         showRaw: 'Xem raw / stack trace',
+    },
+    sqlConsole: {
+        title: 'SQL Console',
+        dangerHint: 'Cẩn trọng — câu lệnh sẽ chạy thẳng trên DB',
+        sqlPlaceholder: 'Nhập câu lệnh SQL... ví dụ: SELECT * FROM users LIMIT 10',
+        run: 'Chạy',
+        clearSql: 'Xoá ô lệnh',
+        shortcutHint: 'Ctrl/Cmd + Enter để chạy',
+        statusSuccess: 'Thành công',
+        statusFailed: 'Thất bại',
+        sqlEmpty: 'Vui lòng nhập câu lệnh SQL',
+        destructiveConfirm: 'Câu lệnh có tính huỷ dữ liệu (DROP/TRUNCATE/ALTER/DELETE/UPDATE). Bạn có chắc?',
+        rowsReturned: 'Trả về {count} dòng',
+        affectedRows: 'Ảnh hưởng {count} dòng',
+        truncatedNotice: 'Kết quả vượt quá giới hạn — chỉ hiển thị {max} dòng đầu.',
+        modifyOk: 'Đã thực thi — {count} dòng bị ảnh hưởng.',
+        ddlOk: 'Đã thực thi.',
     },
     users: {
         title: 'Quản lý người dùng',

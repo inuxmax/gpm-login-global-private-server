@@ -47,6 +47,10 @@
                     <el-icon><Tickets /></el-icon>
                     <span>{{ t('menu.systemLogs') }}</span>
                 </el-menu-item>
+                <el-menu-item index="/admin/app/sql">
+                    <el-icon><Operation /></el-icon>
+                    <span>{{ t('menu.sqlConsole') }}</span>
+                </el-menu-item>
             </el-menu>
 
             <div style="flex: 1"></div>

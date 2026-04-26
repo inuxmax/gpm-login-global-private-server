@@ -177,8 +177,12 @@ class AdminService
     public function runMigrations()
     {
         try {
-            \App\Http\Controllers\UpdateController::migrationDatabase();
-            return ['success' => true, 'message' => 'ok'];
+            $result = \App\Http\Controllers\UpdateController::migrationDatabase();
+            return [
+                'success' => true,
+                'message' => 'ok',
+                'executed' => $result['executed'] ?? []
+            ];
         } catch (\Exception $e) {
             return ['success' => false, 'message' => 'Migration failed: ' . $e->getMessage()];
         }

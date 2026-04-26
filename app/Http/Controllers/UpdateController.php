@@ -47,6 +47,6 @@ class UpdateController extends Controller
     public static function migrationDatabase()
     {
         $updateService = new \App\Services\UpdateService();
-        $updateService->migrationDatabase();
+        return $updateService->migrationDatabase();
     }
 }

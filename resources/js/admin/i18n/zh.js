@@ -14,6 +14,7 @@ export default {
         proxies: '代理管理',
         logs: '日志',
         systemLogs: '系统日志',
+        sqlConsole: 'SQL 控制台',
     },
     share: {
         title: '共享',
@@ -193,6 +194,23 @@ export default {
         truncatedNotice:
             '日志文件超过读取上限 —— 仅显示最后 2MB。如需查看全部内容请清空或下载文件。',
         showRaw: '查看原始 / 堆栈',
+    },
+    sqlConsole: {
+        title: 'SQL 控制台',
+        dangerHint: '注意 — 语句将直接在数据库上执行',
+        sqlPlaceholder: '输入 SQL 语句... 例如：SELECT * FROM users LIMIT 10',
+        run: '运行',
+        clearSql: '清空',
+        shortcutHint: 'Ctrl/Cmd + Enter 运行',
+        statusSuccess: '成功',
+        statusFailed: '失败',
+        sqlEmpty: '请输入 SQL 语句',
+        destructiveConfirm: '该语句具有破坏性 (DROP/TRUNCATE/ALTER/DELETE/UPDATE)，确定继续？',
+        rowsReturned: '返回 {count} 行',
+        affectedRows: '影响 {count} 行',
+        truncatedNotice: '结果超出限制 —— 仅显示前 {max} 行。',
+        modifyOk: '已执行 —— 影响 {count} 行。',
+        ddlOk: '已执行。',
     },
     users: {
         title: '用户管理',

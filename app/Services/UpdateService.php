@@ -77,7 +77,7 @@ class UpdateService
         Storage::delete($zipFileName);
 
         try {
-            $this->migrationDatabase();
+            $migrationResult = $this->migrationDatabase();
         } catch (\Exception $e) {
             return ['success' => false, 'message' => 'Migration failed: ' . $e->getMessage()];
         }
@@ -85,6 +85,7 @@ class UpdateService
         return [
             'success' => true,
             'message' => 'ok',
+            'executed' => $migrationResult['executed'] ?? [],
         ];
     }
 
@@ -137,10 +138,17 @@ class UpdateService
             $executedMigrations = [];
             $errors = [];
 
+            $executedMigrations[] = 'migrationsPath: ' . $migrationsPath;
+            if (empty($migrationFiles)) {
+                $executedMigrations[] = 'No migration files found';
+            }
+
+
             foreach ($migrationFiles as $migrationFile) {
                 $migrationName = basename($migrationFile, '.php');
 
                 if ($this->migrationAlreadyRun($migrationName)) {
+                    $executedMigrations[] = 'Skip ' . $migrationName;
                     continue;
                 }
 
@@ -148,13 +156,16 @@ class UpdateService
                     $sqlStatements = $this->convertMigrationToSQL($migrationFile);
 
                     foreach ($sqlStatements as $sql) {
+                        $executedMigrations[]  = 'Execute ' . $sql;
                         if (!empty(trim($sql))) {
                             DB::statement($sql);
                         }
                     }
 
+                    
+
                     $this->recordMigration($migrationName);
-                    $executedMigrations[] = $migrationName;
+                    $executedMigrations[] = 'Run ' . $migrationName;
 
                 } catch (\Exception $e) {
                     $errors[] = "Migration {$migrationName} failed: " . $e->getMessage();
@@ -177,12 +188,72 @@ class UpdateService
     }
 
 
+    /**
+     * Load a Laravel migration file and capture every SQL statement its
+     * up() method would emit, without executing them. Uses
+     * DB::connection()->pretend() so the schema builder generates real
+     * driver-specific SQL (CREATE TABLE, ADD COLUMN, ALTER, CREATE INDEX,
+     * foreign keys, raw DB::statement calls inside up(), etc.).
+     *
+     * Modern Laravel migrations are written as `return new class extends
+     * Migration { ... };` — `require` returns that instance.
+     *
+     * Returns inlined SQL strings (bindings substituted) ready to feed
+     * into DB::statement(). Returns an empty array for files that don't
+     * follow the expected shape.
+     */
     private function convertMigrationToSQL(string $migrationFile): array
     {
-        $migrationName = basename($migrationFile, '.php');
+        if (!is_file($migrationFile)) {
+            return [];
+        }
+
+        $migration = require $migrationFile;
+        if (!is_object($migration) || !method_exists($migration, 'up')) {
+            return [];
+        }
+
+        $captured = DB::connection()->pretend(function () use ($migration) {
+            $migration->up();
+        });
+
         $sqlStatements = [];
+        foreach ($captured as $entry) {
+            $sql = $entry['query'] ?? '';
+            if ($sql === '') {
+                continue;
+            }
+            $bindings = $entry['bindings'] ?? [];
+            $sqlStatements[] = $bindings ? $this->inlineBindings($sql, $bindings) : $sql;
+        }
 
         return $sqlStatements;
+    }
+
+    /**
+     * Replace `?` placeholders in $sql with safely-quoted literal values.
+     * Schema migrations rarely have bindings, but a few (DEFAULT '...',
+     * comments, raw inserts) do.
+     */
+    private function inlineBindings(string $sql, array $bindings): string
+    {
+        $i = 0;
+        return preg_replace_callback('/\?/', function () use ($bindings, &$i) {
+            if (!array_key_exists($i, $bindings)) {
+                return '?';
+            }
+            $value = $bindings[$i++];
+            if (is_null($value)) {
+                return 'NULL';
+            }
+            if (is_bool($value)) {
+                return $value ? '1' : '0';
+            }
+            if (is_int($value) || is_float($value)) {
+                return (string) $value;
+            }
+            return "'" . str_replace("'", "''", (string) $value) . "'";
+        }, $sql);
     }
 
 

@@ -14,6 +14,7 @@ export default {
         proxies: 'Proxies',
         logs: 'Logs',
         systemLogs: 'System logs',
+        sqlConsole: 'SQL Console',
     },
     share: {
         title: 'Share',
@@ -193,6 +194,23 @@ export default {
         truncatedNotice:
             'Log file is larger than the read limit — only the last 2MB is shown. Clear or download the file for full access.',
         showRaw: 'Show raw / stack trace',
+    },
+    sqlConsole: {
+        title: 'SQL Console',
+        dangerHint: 'Caution — statements run directly against the DB',
+        sqlPlaceholder: 'Type your SQL... e.g. SELECT * FROM users LIMIT 10',
+        run: 'Run',
+        clearSql: 'Clear',
+        shortcutHint: 'Ctrl/Cmd + Enter to run',
+        statusSuccess: 'Success',
+        statusFailed: 'Failed',
+        sqlEmpty: 'Please enter a SQL statement',
+        destructiveConfirm: 'This statement is destructive (DROP/TRUNCATE/ALTER/DELETE/UPDATE). Continue?',
+        rowsReturned: '{count} rows returned',
+        affectedRows: '{count} rows affected',
+        truncatedNotice: 'Result exceeded the limit — showing the first {max} rows only.',
+        modifyOk: 'Executed — {count} rows affected.',
+        ddlOk: 'Executed.',
     },
     users: {
         title: 'User management',

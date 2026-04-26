@@ -7,6 +7,7 @@ import Profiles from './pages/Profiles.vue';
 import Proxies from './pages/Proxies.vue';
 import Logs from './pages/Logs.vue';
 import SystemLogs from './pages/SystemLogs.vue';
+import SqlConsole from './pages/SqlConsole.vue';
 
 const routes = [
     {
@@ -55,6 +56,12 @@ const routes = [
                 name: 'system-logs',
                 component: SystemLogs,
                 meta: { titleKey: 'menu.systemLogs', icon: 'Tickets' },
+            },
+            {
+                path: 'sql',
+                name: 'sql',
+                component: SqlConsole,
+                meta: { titleKey: 'menu.sqlConsole', icon: 'Operation' },
             },
         ],
     },
