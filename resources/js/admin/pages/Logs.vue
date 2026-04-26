@@ -104,12 +104,12 @@
                     <span v-else style="color: #9ca3af">-</span>
                 </template>
             </el-table-column>
-            <el-table-column prop="target_id" :label="t('logs.targetId')" min-width="280">
+            <el-table-column prop="target_id" :label="t('logs.targetId')" width="290">
                 <template #default="{ row }">
                     <span style="font-family: monospace; font-size: 12px">{{ row.target_id || '-' }}</span>
                 </template>
             </el-table-column>
-            <el-table-column :label="t('logs.user')" min-width="180">
+            <el-table-column :label="t('logs.user')" width="230">
                 <template #default="{ row }">
                     <span v-if="row.user">{{ row.user.display_name || row.user.email }}</span>
                     <span v-else style="color: #9ca3af">-</span>

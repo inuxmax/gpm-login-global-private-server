@@ -153,6 +153,7 @@ class AdminService
 
         if ($writeLog !== null) {
             $this->settingService->setSetting('write_log', $writeLog === 'on' ? 'on' : 'off');
+            \App\Services\LogService::flushEnabledCache();
         }
 
         return 'Storage type is changed to: ' . $type;

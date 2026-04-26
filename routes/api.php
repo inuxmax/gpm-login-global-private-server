@@ -66,6 +66,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/get-share-users/{id}', [GroupController::class, 'getGroupShareUsers']);
     });
 
+    // if need log: Route::middleware('log.activity:profiles')->group(function () 
     Route::prefix('profiles')->group(function () {
         Route::get('/', [ProfileController::class, 'index']);
         Route::get('/count', [ProfileController::class, 'getTotal']);

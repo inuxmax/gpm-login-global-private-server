@@ -4,9 +4,19 @@ namespace App\Services;
 
 use App\Models\Log as LogModel;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 
 class LogService
 {
+    public const WRITE_LOG_CACHE_KEY = 'setting:write_log';
+    public const WRITE_LOG_CACHE_TTL = 300; // seconds
+
+    /**
+     * Per-request memoization — within a single request the answer cannot
+     * change, so we resolve it at most once. Reset on each new PHP process.
+     */
+    private static ?bool $isEnabledMemo = null;
+
     protected $settingService;
 
     public function __construct(SettingService $settingService)
@@ -16,10 +26,34 @@ class LogService
 
     /**
      * Whether logging is enabled in settings.
+     *
+     * Two-layer cache:
+     *  - static property: 1 lookup per request (zero cost on subsequent calls)
+     *  - Cache::remember: shared across requests, TTL 5 min, busted on save
      */
     public function isEnabled(): bool
     {
-        return $this->settingService->get('write_log', 'off') === 'on';
+        if (self::$isEnabledMemo !== null) {
+            return self::$isEnabledMemo;
+        }
+
+        $value = Cache::remember(
+            self::WRITE_LOG_CACHE_KEY,
+            self::WRITE_LOG_CACHE_TTL,
+            fn () => $this->settingService->get('write_log', 'off')
+        );
+
+        return self::$isEnabledMemo = ($value === 'on');
+    }
+
+    /**
+     * Drop both cache layers. Call after the write_log setting changes so
+     * the new value takes effect immediately (instead of after TTL).
+     */
+    public static function flushEnabledCache(): void
+    {
+        self::$isEnabledMemo = null;
+        Cache::forget(self::WRITE_LOG_CACHE_KEY);
     }
 
     /**
