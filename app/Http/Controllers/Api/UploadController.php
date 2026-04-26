@@ -9,6 +9,8 @@ use App\Services\UploadService;
 use App\Services\S3UploadService;
 use App\Services\SettingService;
 use App\Services\ProfileService;
+use App\Services\LogService;
+use App\Models\Log as LogModel;
 
 class UploadController extends BaseController
 {
@@ -16,13 +18,22 @@ class UploadController extends BaseController
     protected S3UploadService $s3UploadService;
     protected SettingService $settingService;
     protected ProfileService $profileService;
+    protected LogService $logService;
 
-    public function __construct(UploadService $uploadService, S3UploadService $s3UploadService, SettingService $settingService, ProfileService $profileService)
+    public function __construct(
+        UploadService $uploadService,
+        S3UploadService $s3UploadService,
+        SettingService $settingService,
+        ProfileService $profileService,
+        LogService $logService
+    )
     {
         $this->uploadService = $uploadService;
         $this->s3UploadService = $s3UploadService;
         $this->settingService = $settingService;
         $this->profileService = $profileService;
+        $this->logService = $logService;
+
     }
 
     public function store(Request $request)
@@ -42,6 +53,8 @@ class UploadController extends BaseController
             $content = $request->file('file'); // POST form-data
         }
         $etag = '';
+        $isUploadProfileFile = pathinfo($fileName, PATHINFO_EXTENSION) === ''
+                            && strlen($fileName) === 36;
         try {
             $result = $this->uploadService->storeFile($content, $fileName, $checksumMD5);
             if ($result['success'] == true) {
@@ -50,7 +63,19 @@ class UploadController extends BaseController
             if (is_resource($content)) {
                 try { fclose($content); }
                 catch (\Exception $e) { }
-            }   
+            }
+
+            if($isUploadProfileFile) {
+                $profileId = $fileName;
+
+                $this->logService->create(
+                    $profileId,
+                    'profiles',
+                    LogModel::TYPE_INFO,
+                    "upload profile file: {$fileName}, etag: {$etag}"
+                );
+            }
+
             return response()
                 ->json([
                     'success' => $result['success'],
@@ -59,11 +84,18 @@ class UploadController extends BaseController
                 ])
                 ->header('etag', '"' . $etag . '"');
         } catch (\Exception $e) {
+            $errorMessage = $e->getMessage();
+            $this->logService->create(
+                    $profileId,
+                    'profiles',
+                    LogModel::TYPE_ERROR,
+                    "upload profile error: {$errorMessage}, etag={$etag}"
+                );
             return response()
                 ->json([
                     'success' => false,
                     'message' => 'upload_failed',
-                    'data' => $e->getMessage()
+                    'data' => $errorMessage
                 ]);
         }
     }

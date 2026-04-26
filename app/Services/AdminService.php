@@ -127,7 +127,7 @@ class AdminService
      * @param string $cacheExtension
      * @return string
      */
-    public function saveSettings(string $type, ?string $s3Key = null, ?string $s3Password = null, ?string $s3Bucket = null, ?string $s3Region = null, string $cacheExtension = 'off')
+    public function saveSettings(string $type, ?string $s3Key = null, ?string $s3Password = null, ?string $s3Bucket = null, ?string $s3Region = null, string $cacheExtension = 'off', ?string $writeLog = null)
     {
         // Save storage type setting
         $this->settingService->setSetting('storage_type', $type);
@@ -150,6 +150,11 @@ class AdminService
 
         // Save cache extension setting
         $this->settingService->setSetting('cache_extension', $cacheExtension);
+
+        if ($writeLog !== null) {
+            $this->settingService->setSetting('write_log', $writeLog === 'on' ? 'on' : 'off');
+            \App\Services\LogService::flushEnabledCache();
+        }
 
         return 'Storage type is changed to: ' . $type;
     }

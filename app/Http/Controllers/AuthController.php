@@ -22,7 +22,7 @@ class AuthController extends Controller
             return redirect()->back()->with('error', $result['message']);
         }
 
-        return redirect('/admin');
+        return redirect('/admin/app');
     }
 
     public function logout()

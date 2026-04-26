@@ -1,1 +1,73 @@
+# Version control
 .git
+.gitignore
+.gitattributes
+.github
+
+# IDE / editor
+.vs
+.idea
+.vscode
+.claude
+*.swp
+*.swo
+
+# Node (rebuilt in node-builder stage)
+node_modules
+public/build
+public/hot
+
+# Composer (installed fresh in composer-builder stage)
+vendor
+composer.phar
+
+# Laravel runtime state (generated at runtime via entrypoint)
+storage/logs/*.log
+storage/framework/cache/data/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/framework/testing/*
+storage/app/public/profiles/*
+bootstrap/cache/*.php
+.phpunit.result.cache
+.phpunit.cache
+
+# Environment — DO NOT ship secrets; entrypoint copies .env.example if missing
+.env
+.env.backup
+.env.local
+.env.testing
+.env.production
+
+# Release artifacts
+latest.zip
+latest-update.zip
+create-zip-file.py
+
+# Tests (production image doesn't need them)
+tests
+phpunit.xml
+phpunit.xml.dist
+
+# Lint / CI configs (not needed at runtime)
+phpcs.xml
+phpstan.neon
+LINTING_SETUP.md
+
+# Docker artifacts (not needed inside the image itself)
+Dockerfile
+.dockerignore
+docker-compose.yml
+docker-compose.*.yml
+
+# Python caches
+__pycache__
+*.pyc
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Coverage
+coverage
+coverage.*

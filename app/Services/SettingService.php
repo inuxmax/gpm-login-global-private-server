@@ -21,7 +21,8 @@ class SettingService
             's3_secret' => '',
             's3_bucket' => '',
             's3_region' => '',
-            'cache_extension' => 'off'
+            'cache_extension' => 'off',
+            'write_log' => 'off',
         ];
 
         foreach ($defaultSettings as $key => $value) {

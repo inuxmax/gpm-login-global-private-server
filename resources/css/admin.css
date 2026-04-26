@@ -1,0 +1,133 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --app-sidebar-width: 240px;
+    --app-header-height: 56px;
+}
+
+html,
+body,
+#app {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
+        Arial, 'Noto Sans', sans-serif;
+    background-color: #f5f7fa;
+    color: #1f2937;
+}
+
+/* Element Plus menu tweaks */
+.el-menu--vertical {
+    border-right: none !important;
+}
+
+.app-layout {
+    height: 100vh;
+}
+
+.app-sidebar {
+    width: var(--app-sidebar-width);
+    background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.app-sidebar .el-menu {
+    background: transparent;
+}
+
+.app-sidebar .el-menu-item,
+.app-sidebar .el-sub-menu__title {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.app-sidebar .el-menu-item:hover,
+.app-sidebar .el-sub-menu__title:hover {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    color: #fff !important;
+}
+
+.app-sidebar .el-menu-item.is-active {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    color: #fff !important;
+    border-left: 3px solid #60a5fa;
+}
+
+.app-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.3px;
+}
+
+.app-brand-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+.app-header {
+    height: var(--app-header-height);
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.app-header-title {
+    font-weight: 600;
+    font-size: 15px;
+    color: #111827;
+}
+
+.app-main {
+    padding: 20px;
+    overflow: auto;
+    background: #f5f7fa;
+}
+
+.page-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.page-card + .page-card {
+    margin-top: 16px;
+}
+
+.page-card-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.app-version-chip {
+    font-size: 11px;
+    padding: 2px 8px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 999px;
+}

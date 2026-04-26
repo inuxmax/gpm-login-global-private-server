@@ -19,6 +19,9 @@
                 <div class="alert alert-danger mt-3">
                     <strong>Chi tiết lỗi:</strong>
                     <pre class="mb-0">{{ $error }}</pre>
+                    <hr class="my-2">
+                    <div><strong>DB_HOST:</strong> <code>{{ env('DB_HOST', '(not set)') }}</code></div>
+                    <div><strong>DB_DATABASE:</strong> <code>{{ env('DB_DATABASE', '(not set)') }}</code></div>
                 </div>
             @endif
         </div>
