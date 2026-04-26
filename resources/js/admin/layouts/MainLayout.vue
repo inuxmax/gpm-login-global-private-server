@@ -47,7 +47,7 @@
                     <el-icon><Tickets /></el-icon>
                     <span>{{ t('menu.systemLogs') }}</span>
                 </el-menu-item>
-                <el-menu-item index="/admin/app/sql">
+                <el-menu-item v-if="showAdvanced" index="/admin/app/sql">
                     <el-icon><Operation /></el-icon>
                     <span>{{ t('menu.sqlConsole') }}</span>
                 </el-menu-item>
@@ -105,9 +105,10 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
+import { ElMessage } from 'element-plus';
 import { useAuthStore } from '../stores/auth';
 
 const { t, locale } = useI18n();
@@ -118,6 +119,27 @@ const config = window.__APP_CONFIG__ || {};
 
 const savedLocale = localStorage.getItem('admin_locale');
 if (savedLocale) locale.value = savedLocale;
+
+// SQL Console is dangerous — hidden by default, revealed only when the
+// admin explicitly presses Ctrl/Cmd+Shift+A. Reset on every page load.
+const showAdvanced = ref(false);
+
+function handleAdvancedShortcut(e) {
+    if (!(e.ctrlKey || e.metaKey) || !e.shiftKey) return;
+    if (e.key !== 'A' && e.key !== 'a') return;
+    e.preventDefault();
+    showAdvanced.value = !showAdvanced.value;
+    ElMessage({
+        message: showAdvanced.value
+            ? t('menu.sqlConsoleRevealed')
+            : t('menu.sqlConsoleHidden'),
+        type: showAdvanced.value ? 'warning' : 'info',
+        duration: 1500,
+    });
+}
+
+onMounted(() => window.addEventListener('keydown', handleAdvancedShortcut));
+onBeforeUnmount(() => window.removeEventListener('keydown', handleAdvancedShortcut));
 
 const activeMenu = computed(() => route.path);
 

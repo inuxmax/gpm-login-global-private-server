@@ -15,6 +15,8 @@ export default {
         logs: '日志',
         systemLogs: '系统日志',
         sqlConsole: 'SQL 控制台',
+        sqlConsoleRevealed: '已显示 SQL 控制台',
+        sqlConsoleHidden: '已隐藏 SQL 控制台',
     },
     share: {
         title: '共享',

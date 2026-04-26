@@ -15,6 +15,8 @@ export default {
         logs: 'Logs',
         systemLogs: 'System logs',
         sqlConsole: 'SQL Console',
+        sqlConsoleRevealed: 'SQL Console revealed',
+        sqlConsoleHidden: 'SQL Console hidden',
     },
     share: {
         title: 'Share',

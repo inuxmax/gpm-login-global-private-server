@@ -15,6 +15,8 @@ export default {
         logs: 'Nhật ký',
         systemLogs: 'Log hệ thống',
         sqlConsole: 'SQL Console',
+        sqlConsoleRevealed: 'Đã hiện SQL Console',
+        sqlConsoleHidden: 'Đã ẩn SQL Console',
     },
     share: {
         title: 'Chia sẻ',
