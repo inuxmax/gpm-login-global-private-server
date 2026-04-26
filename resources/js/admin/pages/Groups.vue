@@ -35,13 +35,18 @@
             style="width: 100%"
             :empty-text="t('common.noData')"
         >
-            <el-table-column :label="t('groups.name')" min-width="240">
+            <el-table-column :label="t('groups.name')" min-width="280">
                 <template #default="{ row }">
-                    <div style="display: flex; align-items: center; gap: 8px">
-                        <span>{{ row.name }}</span>
-                        <el-tag v-if="isDefaultGroup(row)" type="info" size="small" disable-transitions>
-                            {{ t('groups.defaultBadge') }}
-                        </el-tag>
+                    <div style="display: flex; flex-direction: column; gap: 2px">
+                        <div style="display: flex; align-items: center; gap: 8px">
+                            <span>{{ row.name }}</span>
+                            <el-tag v-if="isDefaultGroup(row)" type="info" size="small" disable-transitions>
+                                {{ t('groups.defaultBadge') }}
+                            </el-tag>
+                        </div>
+                        <span style="font-family: monospace; font-size: 11px; color: #9ca3af">
+                            {{ row.id }}
+                        </span>
                     </div>
                 </template>
             </el-table-column>
