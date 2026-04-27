@@ -19,3 +19,4 @@ phpunit.xml
 latest.zip
 latest-update.zip
 .claude/*.local.json
+.DS_Store
