@@ -32,7 +32,7 @@
         <img src="assets/img/running.png">
 
         @php
-            $adminUrl = url('admin');
+            $adminUrl = url('admin/app/system');
         @endphp
 
         <a href="{{$adminUrl}}" style="font-size: 21px">Go to the admin site</a>
