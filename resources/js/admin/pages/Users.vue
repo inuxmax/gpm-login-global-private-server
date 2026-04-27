@@ -60,27 +60,54 @@
                     </el-tag>
                 </template>
             </el-table-column>
-            <el-table-column :label="t('common.actions')" width="280" fixed="right">
+            <el-table-column
+                :label="t('common.actions')"
+                :width="isMobile ? 56 : 280"
+                fixed="right"
+                align="center"
+            >
                 <template #default="{ row }">
-                    <el-button
-                        size="small"
-                        :type="row.is_active ? 'danger' : 'success'"
-                        plain
-                        :loading="row._toggling"
-                        @click="toggleActive(row)"
-                    >
-                        {{ row.is_active ? t('users.deactivate') : t('users.activate') }}
-                    </el-button>
-                    <el-button
-                        size="small"
-                        type="warning"
-                        plain
-                        :loading="row._resetting"
-                        @click="resetPassword(row)"
-                    >
-                        <el-icon style="margin-right: 3px"><Key /></el-icon>
-                        {{ t('users.resetPassword') }}
-                    </el-button>
+                    <el-dropdown v-if="isMobile" trigger="click" @command="(cmd) => onActionCommand(cmd, row)">
+                        <el-button size="small" plain>
+                            <el-icon><MoreFilled /></el-icon>
+                        </el-button>
+                        <template #dropdown>
+                            <el-dropdown-menu>
+                                <el-dropdown-item command="toggleActive">
+                                    <el-icon>
+                                        <CircleClose v-if="row.is_active" />
+                                        <CircleCheck v-else />
+                                    </el-icon>
+                                    {{ row.is_active ? t('users.deactivate') : t('users.activate') }}
+                                </el-dropdown-item>
+                                <el-dropdown-item command="resetPassword" divided>
+                                    <el-icon><Key /></el-icon>{{ t('users.resetPassword') }}
+                                </el-dropdown-item>
+                            </el-dropdown-menu>
+                        </template>
+                    </el-dropdown>
+
+                    <template v-else>
+                        <el-button
+                            size="small"
+                            :type="row.is_active ? 'danger' : 'success'"
+                            plain
+                            :loading="row._toggling"
+                            @click="toggleActive(row)"
+                        >
+                            {{ row.is_active ? t('users.deactivate') : t('users.activate') }}
+                        </el-button>
+                        <el-button
+                            size="small"
+                            type="warning"
+                            plain
+                            :loading="row._resetting"
+                            @click="resetPassword(row)"
+                        >
+                            <el-icon style="margin-right: 3px"><Key /></el-icon>
+                            {{ t('users.resetPassword') }}
+                        </el-button>
+                    </template>
                 </template>
             </el-table-column>
         </el-table>
@@ -124,8 +151,15 @@ import { onMounted, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { http } from '../api/http';
+import { useIsMobile } from '../composables/useIsMobile';
 
 const { t } = useI18n();
+const isMobile = useIsMobile();
+
+function onActionCommand(cmd, row) {
+    if (cmd === 'toggleActive') toggleActive(row);
+    else if (cmd === 'resetPassword') resetPassword(row);
+}
 
 const users = ref([]);
 const loading = ref(false);

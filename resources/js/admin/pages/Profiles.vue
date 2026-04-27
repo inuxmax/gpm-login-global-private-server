@@ -231,9 +231,50 @@
                     </span>
                 </template>
             </el-table-column>
-            <el-table-column :label="t('common.actions')" width="220" fixed="right">
+            <el-table-column
+                :label="t('common.actions')"
+                :width="isMobile ? 56 : 220"
+                fixed="right"
+                align="center"
+            >
                 <template #default="{ row }">
+                    <el-dropdown v-if="isMobile" trigger="click" @command="(cmd) => onActionCommand(cmd, row)">
+                        <el-button size="small" plain>
+                            <el-icon><MoreFilled /></el-icon>
+                        </el-button>
+                        <template #dropdown>
+                            <el-dropdown-menu>
+                                <template v-if="tab === 'active'">
+                                    <el-dropdown-item command="viewLogs">
+                                        <el-icon><Document /></el-icon>{{ t('profiles.viewLogs') }}
+                                    </el-dropdown-item>
+                                    <el-dropdown-item command="edit">
+                                        <el-icon><Edit /></el-icon>{{ t('common.edit') }}
+                                    </el-dropdown-item>
+                                    <el-dropdown-item command="share">
+                                        <el-icon><Share /></el-icon>{{ t('share.title') }}
+                                    </el-dropdown-item>
+                                    <el-dropdown-item command="resetStatus" :disabled="row.status === 1">
+                                        <el-icon><RefreshRight /></el-icon>{{ t('profiles.resetStatus') }}
+                                    </el-dropdown-item>
+                                    <el-dropdown-item command="softDelete" divided>
+                                        <el-icon><Delete /></el-icon>{{ t('profiles.softDelete') }}
+                                    </el-dropdown-item>
+                                </template>
+                                <template v-else>
+                                    <el-dropdown-item command="restore">
+                                        <el-icon><RefreshRight /></el-icon>{{ t('profiles.restore') }}
+                                    </el-dropdown-item>
+                                    <el-dropdown-item command="hardDelete" divided>
+                                        <el-icon><Remove /></el-icon>{{ t('profiles.hardDelete') }}
+                                    </el-dropdown-item>
+                                </template>
+                            </el-dropdown-menu>
+                        </template>
+                    </el-dropdown>
+
                     <div
+                        v-else
                         class="profile-actions"
                         style="display: flex; flex-wrap: nowrap; gap: 4px; justify-content: flex-start"
                     >
@@ -372,10 +413,25 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 import { http } from '../api/http';
 import ShareDialog from '../components/ShareDialog.vue';
 import LogListDialog from '../components/LogListDialog.vue';
+import { useIsMobile } from '../composables/useIsMobile';
 
 const { t } = useI18n();
+const isMobile = useIsMobile();
 
 const logsDialog = reactive({ visible: false, targetId: '', targetName: '' });
+
+function onActionCommand(cmd, row) {
+    const handlers = {
+        viewLogs,
+        edit: openEdit,
+        share: openShare,
+        resetStatus,
+        softDelete,
+        restore,
+        hardDelete,
+    };
+    handlers[cmd]?.(row);
+}
 
 function viewLogs(row) {
     logsDialog.targetId = row.id;

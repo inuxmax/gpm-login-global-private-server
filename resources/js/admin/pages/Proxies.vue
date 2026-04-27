@@ -103,18 +103,44 @@
                     <span style="font-size: 12px; color: #6b7280">{{ formatTime(row.created_at) }}</span>
                 </template>
             </el-table-column>
-            <el-table-column :label="t('common.actions')" width="220" fixed="right">
+            <el-table-column
+                :label="t('common.actions')"
+                :width="isMobile ? 56 : 220"
+                fixed="right"
+                align="center"
+            >
                 <template #default="{ row }">
-                    <el-button size="small" type="info" plain @click="openShare(row)">
-                        <el-icon><Share /></el-icon>
-                    </el-button>
-                    <el-button size="small" type="primary" plain @click="openEdit(row)">
-                        <el-icon style="margin-right: 3px"><Edit /></el-icon>
-                        {{ t('common.edit') }}
-                    </el-button>
-                    <el-button size="small" type="danger" plain :loading="row._busy" @click="deleteRow(row)">
-                        <el-icon><Delete /></el-icon>
-                    </el-button>
+                    <el-dropdown v-if="isMobile" trigger="click" @command="(cmd) => onActionCommand(cmd, row)">
+                        <el-button size="small" plain>
+                            <el-icon><MoreFilled /></el-icon>
+                        </el-button>
+                        <template #dropdown>
+                            <el-dropdown-menu>
+                                <el-dropdown-item command="share">
+                                    <el-icon><Share /></el-icon>{{ t('share.title') }}
+                                </el-dropdown-item>
+                                <el-dropdown-item command="edit">
+                                    <el-icon><Edit /></el-icon>{{ t('common.edit') }}
+                                </el-dropdown-item>
+                                <el-dropdown-item command="delete" divided>
+                                    <el-icon><Delete /></el-icon>{{ t('common.delete') }}
+                                </el-dropdown-item>
+                            </el-dropdown-menu>
+                        </template>
+                    </el-dropdown>
+
+                    <template v-else>
+                        <el-button size="small" type="info" plain @click="openShare(row)">
+                            <el-icon><Share /></el-icon>
+                        </el-button>
+                        <el-button size="small" type="primary" plain @click="openEdit(row)">
+                            <el-icon style="margin-right: 3px"><Edit /></el-icon>
+                            {{ t('common.edit') }}
+                        </el-button>
+                        <el-button size="small" type="danger" plain :loading="row._busy" @click="deleteRow(row)">
+                            <el-icon><Delete /></el-icon>
+                        </el-button>
+                    </template>
                 </template>
             </el-table-column>
         </el-table>
@@ -206,8 +232,16 @@ import { useI18n } from 'vue-i18n';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { http } from '../api/http';
 import ShareDialog from '../components/ShareDialog.vue';
+import { useIsMobile } from '../composables/useIsMobile';
 
 const { t } = useI18n();
+const isMobile = useIsMobile();
+
+function onActionCommand(cmd, row) {
+    if (cmd === 'share') openShare(row);
+    else if (cmd === 'edit') openEdit(row);
+    else if (cmd === 'delete') deleteRow(row);
+}
 
 const loading = ref(false);
 const rows = ref([]);

@@ -148,7 +148,12 @@
                 </template>
             </el-table-column>
             <el-table-column prop="message" :label="t('logs.message')" min-width="240" />
-            <el-table-column :label="t('common.actions')" width="120" fixed="right">
+            <el-table-column
+                :label="t('common.actions')"
+                :width="isMobile ? 56 : 120"
+                fixed="right"
+                align="center"
+            >
                 <template #default="{ row }">
                     <el-button
                         size="small"
@@ -157,8 +162,8 @@
                         :loading="row._deleting"
                         @click="deleteOne(row)"
                     >
-                        <el-icon style="margin-right: 3px"><Delete /></el-icon>
-                        {{ t('common.delete') }}
+                        <el-icon :style="isMobile ? '' : 'margin-right: 3px'"><Delete /></el-icon>
+                        <span v-if="!isMobile">{{ t('common.delete') }}</span>
                     </el-button>
                 </template>
             </el-table-column>
@@ -185,11 +190,13 @@ import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { http } from '../api/http';
+import { useIsMobile } from '../composables/useIsMobile';
 
 const route = useRoute();
 const router = useRouter();
 
 const { t } = useI18n();
+const isMobile = useIsMobile();
 
 const targetTypeOptions = computed(() => [
     { value: 'profile', label: t('logs.targetProfile') },

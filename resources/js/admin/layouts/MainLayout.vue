@@ -1,9 +1,12 @@
 <template>
     <el-container class="app-layout">
-        <el-aside class="app-sidebar">
+        <el-aside
+            class="app-sidebar app-sidebar--desktop"
+            :class="{ 'app-sidebar--collapsed': sidebarCollapsed }"
+        >
             <div class="app-brand">
                 <div class="app-brand-icon">G</div>
-                <div style="flex: 1">
+                <div v-if="!sidebarCollapsed" style="flex: 1; min-width: 0">
                     <div>{{ t('app.title') }}</div>
                     <div class="app-version-chip" style="margin-top: 2px; display: inline-block">
                         v{{ authStore.serverVersion }}
@@ -13,82 +16,164 @@
 
             <el-menu
                 :default-active="activeMenu"
+                :collapse="sidebarCollapsed"
+                :collapse-transition="false"
                 router
                 class="app-menu"
                 background-color="transparent"
                 text-color="rgba(255,255,255,0.85)"
                 active-text-color="#ffffff"
             >
-                <el-menu-item index="/admin/app/system">
-                    <el-icon><Setting /></el-icon>
-                    <span>{{ t('menu.systemSettings') }}</span>
-                </el-menu-item>
-                <el-menu-item index="/admin/app/users">
-                    <el-icon><User /></el-icon>
-                    <span>{{ t('menu.users') }}</span>
-                </el-menu-item>
-                <el-menu-item index="/admin/app/groups">
-                    <el-icon><Collection /></el-icon>
-                    <span>{{ t('menu.groups') }}</span>
-                </el-menu-item>
-                <el-menu-item index="/admin/app/profiles">
-                    <el-icon><UserFilled /></el-icon>
-                    <span>{{ t('menu.profiles') }}</span>
-                </el-menu-item>
-                <el-menu-item index="/admin/app/proxies">
-                    <el-icon><Connection /></el-icon>
-                    <span>{{ t('menu.proxies') }}</span>
-                </el-menu-item>
-                <el-menu-item index="/admin/app/logs">
-                    <el-icon><Document /></el-icon>
-                    <span>{{ t('menu.logs') }}</span>
-                </el-menu-item>
-                <el-menu-item index="/admin/app/system-logs">
-                    <el-icon><Tickets /></el-icon>
-                    <span>{{ t('menu.systemLogs') }}</span>
-                </el-menu-item>
-                <el-menu-item v-if="showAdvanced" index="/admin/app/sql">
-                    <el-icon><Operation /></el-icon>
-                    <span>{{ t('menu.sqlConsole') }}</span>
+                <el-menu-item
+                    v-for="item in menuItems"
+                    :key="item.path"
+                    :index="item.path"
+                >
+                    <el-icon><component :is="item.icon" /></el-icon>
+                    <template #title>{{ t(item.labelKey) }}</template>
                 </el-menu-item>
             </el-menu>
 
             <div style="flex: 1"></div>
 
-            <div style="padding: 12px 16px; border-top: 1px solid rgba(255, 255, 255, 0.08)">
-                <div style="font-size: 12px; opacity: 0.75; margin-bottom: 8px">
+            <div class="app-sidebar-footer">
+                <div v-if="!sidebarCollapsed" style="font-size: 12px; opacity: 0.75; margin-bottom: 8px">
                     {{ authStore.displayName }}
                 </div>
-                <el-button size="small" style="width: 100%" @click="handleLogout">
-                    <el-icon style="margin-right: 4px"><SwitchButton /></el-icon>
-                    {{ t('app.logout') }}
-                </el-button>
+                <el-tooltip
+                    :content="t('app.logout')"
+                    placement="right"
+                    :disabled="!sidebarCollapsed"
+                >
+                    <el-button size="small" style="width: 100%" @click="handleLogout">
+                        <el-icon :style="sidebarCollapsed ? '' : 'margin-right: 4px'">
+                            <SwitchButton />
+                        </el-icon>
+                        <span v-if="!sidebarCollapsed">{{ t('app.logout') }}</span>
+                    </el-button>
+                </el-tooltip>
             </div>
         </el-aside>
 
+        <el-drawer
+            v-model="drawerOpen"
+            direction="ltr"
+            :with-header="false"
+            size="224px"
+            class="app-sidebar-drawer"
+        >
+            <div class="app-sidebar app-sidebar--drawer">
+                <div class="app-brand">
+                    <div class="app-brand-icon">G</div>
+                    <div style="flex: 1">
+                        <div>{{ t('app.title') }}</div>
+                        <div class="app-version-chip" style="margin-top: 2px; display: inline-block">
+                            v{{ authStore.serverVersion }}
+                        </div>
+                    </div>
+                </div>
+
+                <el-menu
+                    :default-active="activeMenu"
+                    router
+                    class="app-menu"
+                    background-color="transparent"
+                    text-color="rgba(255,255,255,0.85)"
+                    active-text-color="#ffffff"
+                    @select="drawerOpen = false"
+                >
+                    <el-menu-item
+                        v-for="item in menuItems"
+                        :key="item.path"
+                        :index="item.path"
+                    >
+                        <el-icon><component :is="item.icon" /></el-icon>
+                        <span>{{ t(item.labelKey) }}</span>
+                    </el-menu-item>
+                </el-menu>
+
+                <div style="flex: 1"></div>
+
+                <div style="padding: 12px 16px; border-top: 1px solid rgba(255, 255, 255, 0.08)">
+                    <div style="font-size: 12px; opacity: 0.75; margin-bottom: 8px">
+                        {{ authStore.displayName }}
+                    </div>
+                    <el-button size="small" style="width: 100%" @click="handleLogout">
+                        <el-icon style="margin-right: 4px"><SwitchButton /></el-icon>
+                        {{ t('app.logout') }}
+                    </el-button>
+                </div>
+            </div>
+        </el-drawer>
+
         <el-container>
             <el-header class="app-header">
-                <div class="app-header-title">
-                    {{ currentPageTitle }}
-                </div>
-                <div style="display: flex; align-items: center; gap: 10px">
-                    <el-select
-                        v-model="locale"
-                        size="small"
-                        style="width: 130px"
-                        @change="onLocaleChange"
+                <div style="display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1">
+                    <el-button
+                        class="app-header-burger"
+                        text
+                        size="large"
+                        @click="toggleSidebar"
                     >
-                        <template #prefix>
-                            <el-icon><Promotion /></el-icon>
+                        <el-icon :size="20">
+                            <Fold v-if="!sidebarCollapsed" />
+                            <Expand v-else />
+                        </el-icon>
+                    </el-button>
+                    <div class="app-header-title">
+                        {{ currentPageTitle }}
+                    </div>
+                </div>
+                <div class="app-header-actions">
+                    <el-dropdown
+                        trigger="click"
+                        class="app-header-locale"
+                        @command="onLocaleChange"
+                    >
+                        <el-button size="small" plain class="app-header-locale-btn">
+                            <el-icon class="app-header-locale-globe">
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <circle cx="12" cy="12" r="10" />
+                                    <path d="M2 12h20" />
+                                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                                </svg>
+                            </el-icon>
+                            <span class="app-header-locale-label">{{ currentLocaleLabel }}</span>
+                            <el-icon class="app-header-locale-caret"><ArrowDown /></el-icon>
+                        </el-button>
+                        <template #dropdown>
+                            <el-dropdown-menu>
+                                <el-dropdown-item
+                                    v-for="opt in localeOptions"
+                                    :key="opt.value"
+                                    :command="opt.value"
+                                    :class="{ 'is-active-locale': locale === opt.value }"
+                                >
+                                    <span style="min-width: 16px; display: inline-block">
+                                        <el-icon v-if="locale === opt.value"><Check /></el-icon>
+                                    </span>
+                                    {{ opt.label }}
+                                </el-dropdown-item>
+                            </el-dropdown-menu>
                         </template>
-                        <el-option label="Tiếng Việt" value="vi" />
-                        <el-option label="English" value="en" />
-                        <el-option label="中文" value="zh" />
-                    </el-select>
+                    </el-dropdown>
 
-                    <el-button type="primary" plain size="small" @click="switchToOldUi">
+                    <el-button
+                        type="primary"
+                        plain
+                        size="small"
+                        class="app-header-switch-ui"
+                        @click="switchToOldUi"
+                    >
                         <el-icon style="margin-right: 4px"><Monitor /></el-icon>
-                        {{ t('app.switchToOldUi') }}
+                        <span class="app-header-switch-ui-label">{{ t('app.switchToOldUi') }}</span>
                     </el-button>
                 </div>
             </el-header>
@@ -105,7 +190,7 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { ElMessage } from 'element-plus';
@@ -141,7 +226,49 @@ function handleAdvancedShortcut(e) {
 onMounted(() => window.addEventListener('keydown', handleAdvancedShortcut));
 onBeforeUnmount(() => window.removeEventListener('keydown', handleAdvancedShortcut));
 
+const drawerOpen = ref(false);
+watch(() => route.path, () => (drawerOpen.value = false));
+
+const sidebarCollapsed = ref(localStorage.getItem('admin_sidebar_collapsed') === '1');
+const isMobileViewport = window.matchMedia('(max-width: 768px)');
+
+function toggleSidebar() {
+    if (isMobileViewport.matches) {
+        drawerOpen.value = true;
+        return;
+    }
+    sidebarCollapsed.value = !sidebarCollapsed.value;
+    localStorage.setItem('admin_sidebar_collapsed', sidebarCollapsed.value ? '1' : '0');
+}
+
+const menuItems = computed(() => {
+    const items = [
+        { path: '/admin/app/system', icon: 'Setting', labelKey: 'menu.systemSettings' },
+        { path: '/admin/app/users', icon: 'User', labelKey: 'menu.users' },
+        { path: '/admin/app/groups', icon: 'Collection', labelKey: 'menu.groups' },
+        { path: '/admin/app/profiles', icon: 'UserFilled', labelKey: 'menu.profiles' },
+        { path: '/admin/app/proxies', icon: 'Connection', labelKey: 'menu.proxies' },
+        { path: '/admin/app/logs', icon: 'Document', labelKey: 'menu.logs' },
+        { path: '/admin/app/system-logs', icon: 'Tickets', labelKey: 'menu.systemLogs' },
+    ];
+    if (showAdvanced.value) {
+        items.push({ path: '/admin/app/sql', icon: 'Operation', labelKey: 'menu.sqlConsole' });
+    }
+    return items;
+});
+
 const activeMenu = computed(() => route.path);
+
+const localeOptions = [
+    { value: 'vi', label: 'Tiếng Việt', short: 'VI' },
+    { value: 'en', label: 'English', short: 'EN' },
+    { value: 'zh', label: '中文', short: '中' },
+];
+
+const currentLocaleLabel = computed(() => {
+    const opt = localeOptions.find((o) => o.value === locale.value);
+    return opt ? opt.label : locale.value;
+});
 
 const currentPageTitle = computed(() => {
     const key = route.meta?.titleKey;
