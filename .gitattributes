@@ -1,5 +1,11 @@
 * text=auto
 
+# Force LF on shell scripts so Docker builds from Windows checkouts
+# don't end up with CRLF inside the image (breaks bash interpreters).
+*.sh                  text eol=lf
+start-container       text eol=lf
+docker/entrypoint.sh  text eol=lf
+
 *.blade.php diff=html
 *.css diff=css
 *.html diff=html
