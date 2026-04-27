@@ -72,6 +72,24 @@
             </div>
         </div>
 
+        <el-alert
+            v-if="writeLogEnabled === false"
+            type="warning"
+            :closable="false"
+            show-icon
+            style="margin-bottom: 12px"
+            :title="t('logs.disabledTitle')"
+        >
+            <template #default>
+                <div>
+                    {{ t('logs.disabledDesc') }}
+                    <router-link to="/admin/app/system" style="margin-left: 4px">
+                        {{ t('logs.goToSettings') }}
+                    </router-link>
+                </div>
+            </template>
+        </el-alert>
+
         <el-table
             v-loading="loading"
             :data="logs"
@@ -164,6 +182,7 @@ const targetTypeOptions = computed(() => [
 
 const logs = ref([]);
 const loading = ref(false);
+const writeLogEnabled = ref(null); // null while unknown so banner doesn't flash
 let searchTimer = null;
 
 const filters = reactive({
@@ -221,6 +240,7 @@ async function fetchLogs() {
             pagination.total = payload.total || 0;
             pagination.page = payload.current_page || 1;
             pagination.perPage = payload.per_page || pagination.perPage;
+            writeLogEnabled.value = !!data.write_log_enabled;
         }
     } catch (err) {
         ElMessage.error(err?.response?.data?.message || t('common.error'));

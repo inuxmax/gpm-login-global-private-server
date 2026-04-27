@@ -186,6 +186,9 @@ export default {
         deleteAllConfirm: '按当前筛选条件删除全部日志？此操作不可撤销。',
         deletedCount: '已删除 {count} 条日志',
         empty: '暂无日志',
+        disabledTitle: '日志记录已关闭',
+        disabledDesc: '系统当前不会写入新日志。前往',
+        goToSettings: '系统设置',
     },
     systemLogs: {
         title: 'Laravel 系统日志',

@@ -186,6 +186,9 @@ export default {
         deleteAllConfirm: 'Xoá tất cả nhật ký theo bộ lọc hiện tại? Hành động không thể hoàn tác.',
         deletedCount: 'Đã xoá {count} nhật ký',
         empty: 'Chưa có nhật ký nào',
+        disabledTitle: 'Ghi nhật ký đang TẮT',
+        disabledDesc: 'Hệ thống hiện không ghi nhật ký mới. Bật ở',
+        goToSettings: 'Cấu hình hệ thống',
     },
     systemLogs: {
         title: 'Log hệ thống Laravel',

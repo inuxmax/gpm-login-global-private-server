@@ -28,7 +28,11 @@ class LogController extends Controller
 
         $logs = $this->logService->paginate($filters);
 
-        return response()->json(['success' => true, 'data' => $logs]);
+        return response()->json([
+            'success' => true,
+            'data' => $logs,
+            'write_log_enabled' => $this->logService->isEnabled(),
+        ]);
     }
 
     public function destroy($id)

@@ -186,6 +186,9 @@ export default {
         deleteAllConfirm: 'Delete all logs matching the current filters? This cannot be undone.',
         deletedCount: 'Deleted {count} logs',
         empty: 'No logs yet',
+        disabledTitle: 'Logging is OFF',
+        disabledDesc: 'New activity is not being recorded. Enable it in',
+        goToSettings: 'System settings',
     },
     systemLogs: {
         title: 'Laravel system log',
