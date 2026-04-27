@@ -245,7 +245,7 @@
                 @csrf
 
                 <div class="field">
-                    <label for="email">Email</label>
+                    <label for="email">Username</label>
                     <input
                         id="email"
                         type="text"
