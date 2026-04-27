@@ -30,6 +30,18 @@ EXCLUDE_COMMON = [
     "latest-update.zip",
 ]
 
+# File cụ thể (so sánh full-path) loại trừ trong CẢ HAI file zip.
+# Khác EXCLUDE_COMMON ở chỗ chỉ match đúng đường dẫn, không match theo segment.
+EXCLUDE_COMMON_FILES = [
+    # Laravel package-discovery cache: machine-specific (ref các package
+    # require-dev như nunomaduro/collision). Phải để server tự regenerate,
+    # nếu không sẽ lỗi "Class ... not found".
+    os.path.join("bootstrap", "cache", "packages.php"),
+    os.path.join("bootstrap", "cache", "services.php"),
+    os.path.join("bootstrap", "cache", "config.php"),
+    os.path.join("bootstrap", "cache", "routes-v7.php"),
+]
+
 # Loại trừ THÊM cho file "latest-update.zip"
 EXCLUDE_UPDATE_DIRS = [
     "vendor",
@@ -89,6 +101,10 @@ def should_exclude(rel_path: str, extra_dirs=None, extra_files=None, force_inclu
 
     for exclude in EXCLUDE_COMMON:
         if Path(normalize(exclude)).parts[0] in parts:
+            return True
+
+    for f in EXCLUDE_COMMON_FILES:
+        if normalize(rel_path) == normalize(f):
             return True
 
     if extra_dirs:
