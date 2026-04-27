@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\Profile;
 use App\Services\AdminService;
+use App\Services\LogService;
 use App\Services\SettingService;
 use App\Services\WebAuthService;
 
@@ -15,15 +16,18 @@ class AdminApiController extends Controller
     protected $adminService;
     protected $settingService;
     protected $webAuthService;
+    protected $logService;
 
     public function __construct(
         AdminService $adminService,
         SettingService $settingService,
-        WebAuthService $webAuthService
+        WebAuthService $webAuthService,
+        LogService $logService
     ) {
         $this->adminService = $adminService;
         $this->settingService = $settingService;
         $this->webAuthService = $webAuthService;
+        $this->logService = $logService;
     }
 
     public function me(Request $request)
@@ -66,6 +70,9 @@ class AdminApiController extends Controller
 
     public function saveSettings(Request $request)
     {
+        // Make sure the logs table exists before users toggle write_log on.
+        $this->logService->ensureTableExists();
+
         $message = $this->adminService->saveSettings(
             $request->input('storage_type', 'local'),
             $request->input('S3_KEY'),

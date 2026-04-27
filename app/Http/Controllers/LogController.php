@@ -16,6 +16,8 @@ class LogController extends Controller
 
     public function index(Request $request)
     {
+        $this->logService->ensureTableExists();
+
         $filters = [
             'search' => $request->query('search'),
             'type' => $request->query('type'),

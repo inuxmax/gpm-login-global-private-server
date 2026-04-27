@@ -5,6 +5,9 @@ namespace App\Services;
 use App\Models\Log as LogModel;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 class LogService
 {
@@ -54,6 +57,63 @@ class LogService
     {
         self::$isEnabledMemo = null;
         Cache::forget(self::WRITE_LOG_CACHE_KEY);
+    }
+
+    /**
+     * Per-request memo so we don't re-check the table on every call.
+     * Resets between PHP processes — fine since the table only ever goes
+     * from "missing" to "present" within a process.
+     */
+    private static ?bool $tableEnsuredMemo = null;
+
+    /**
+     * Make sure the `logs` table exists. If not, run the bundled SQL file
+     * (database/migrations/create-log-table.sql) to create it.
+     *
+     * Safe to call from any hot path — short-circuits via a static memo
+     * after the first successful check. Errors are logged to laravel.log
+     * but never thrown so callers don't have to worry about them.
+     */
+    public function ensureTableExists(): bool
+    {
+        if (self::$tableEnsuredMemo === true) {
+            return true;
+        }
+
+        try {
+            if (Schema::hasTable('logs')) {
+                self::$tableEnsuredMemo = true;
+                return true;
+            }
+
+            $sqlFile = database_path('migrations/create-log-table.sql');
+            if (!is_file($sqlFile)) {
+                Log::warning('LogService::ensureTableExists missing SQL file', ['path' => $sqlFile]);
+                return false;
+            }
+
+            $sql = (string) file_get_contents($sqlFile);
+            // Strip line comments so naive split-by-`;` doesn't choke on
+            // semicolons inside `-- ...` lines.
+            $sql = preg_replace('/^\s*--[^\n]*$/m', '', $sql);
+
+            foreach (preg_split('/;\s*(?=(?:[^\']*\'[^\']*\')*[^\']*$)/', $sql) as $statement) {
+                $statement = trim((string) $statement);
+                if ($statement === '') {
+                    continue;
+                }
+                DB::statement($statement);
+            }
+
+            self::$tableEnsuredMemo = Schema::hasTable('logs');
+
+            return self::$tableEnsuredMemo;
+        } catch (\Throwable $e) {
+            Log::error('LogService::ensureTableExists failed: ' . $e->getMessage(), [
+                'exception' => $e,
+            ]);
+            return false;
+        }
     }
 
     /**

@@ -16,4 +16,4 @@ CREATE TABLE IF NOT EXISTS `logs` (
     KEY `logs_type_index` (`type`),
     CONSTRAINT `logs_user_id_foreign`
         FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
