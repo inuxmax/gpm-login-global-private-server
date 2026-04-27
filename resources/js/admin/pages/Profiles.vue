@@ -71,6 +71,17 @@
                 <el-icon><Refresh /></el-icon>
             </el-button>
 
+            <el-button
+                v-if="tab === 'active'"
+                type="success"
+                plain
+                :loading="resettingAllStatus"
+                @click="resetAllStatus"
+            >
+                <el-icon style="margin-right: 4px"><RefreshRight /></el-icon>
+                {{ t('settings.resetProfileStatus') }}
+            </el-button>
+
             <el-popover placement="bottom-end" :width="200" trigger="click">
                 <template #reference>
                     <el-button>
@@ -365,6 +376,7 @@ const total = ref(0);
 const selection = ref([]);
 const sizes = ref({});
 const bulkBusy = ref(false);
+const resettingAllStatus = ref(false);
 let searchTimer = null;
 
 const shareDialog = ref({ visible: false, ids: [], name: '' });
@@ -566,6 +578,32 @@ function onTabChange() {
     search.value = '';
     sizes.value = {};
     fetchList();
+}
+
+async function resetAllStatus() {
+    try {
+        await ElMessageBox.confirm(
+            t('settings.resetProfileStatusConfirm'),
+            t('common.confirm'),
+            { type: 'warning' }
+        );
+    } catch {
+        return;
+    }
+    resettingAllStatus.value = true;
+    try {
+        const { data } = await http.post('/reset-profile-status');
+        if (data?.success) {
+            ElMessage.success(data?.message || t('common.success'));
+            await fetchList();
+        } else {
+            ElMessage.error(data?.message || t('common.error'));
+        }
+    } catch (err) {
+        ElMessage.error(err?.response?.data?.message || t('common.error'));
+    } finally {
+        resettingAllStatus.value = false;
+    }
 }
 
 async function resetStatus(row) {
