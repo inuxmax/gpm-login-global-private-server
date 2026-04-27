@@ -130,6 +130,7 @@ export default {
         emptyTrash: 'Thùng rác trống',
         edit: 'Sửa profile',
         nameRequired: 'Vui lòng nhập tên',
+        viewLogs: 'Xem nhật ký',
     },
     proxies: {
         rawProxy: 'Proxy',
@@ -189,6 +190,9 @@ export default {
         disabledTitle: 'Ghi nhật ký đang TẮT',
         disabledDesc: 'Hệ thống hiện không ghi nhật ký mới. Bật ở',
         goToSettings: 'Cấu hình hệ thống',
+        filteringByTarget: 'Đang lọc theo target_id',
+        titleForTarget: 'Nhật ký: {name}',
+        openFullPage: 'Mở trang Nhật ký',
     },
     systemLogs: {
         title: 'Log hệ thống Laravel',

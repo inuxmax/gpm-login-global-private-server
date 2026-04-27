@@ -130,6 +130,7 @@ export default {
         emptyTrash: 'Trash is empty',
         edit: 'Edit profile',
         nameRequired: 'Please enter a name',
+        viewLogs: 'View logs',
     },
     proxies: {
         rawProxy: 'Proxy',
@@ -189,6 +190,9 @@ export default {
         disabledTitle: 'Logging is OFF',
         disabledDesc: 'New activity is not being recorded. Enable it in',
         goToSettings: 'System settings',
+        filteringByTarget: 'Filtering by target_id',
+        titleForTarget: 'Logs: {name}',
+        openFullPage: 'Open logs page',
     },
     systemLogs: {
         title: 'Laravel system log',

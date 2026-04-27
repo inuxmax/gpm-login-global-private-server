@@ -130,6 +130,7 @@ export default {
         emptyTrash: '回收站为空',
         edit: '编辑配置',
         nameRequired: '请输入名称',
+        viewLogs: '查看日志',
     },
     proxies: {
         rawProxy: '代理',
@@ -189,6 +190,9 @@ export default {
         disabledTitle: '日志记录已关闭',
         disabledDesc: '系统当前不会写入新日志。前往',
         goToSettings: '系统设置',
+        filteringByTarget: '按 target_id 筛选',
+        titleForTarget: '日志：{name}',
+        openFullPage: '打开日志页',
     },
     systemLogs: {
         title: 'Laravel 系统日志',

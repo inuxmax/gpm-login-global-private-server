@@ -72,6 +72,20 @@
             </div>
         </div>
 
+        <div v-if="filters.target_id" style="margin-bottom: 12px">
+            <el-tag
+                type="primary"
+                closable
+                disable-transitions
+                @close="clearTargetIdFilter"
+            >
+                {{ t('logs.filteringByTarget') }}:
+                <span style="font-family: monospace; font-size: 12px; margin-left: 4px">
+                    {{ filters.target_id }}
+                </span>
+            </el-tag>
+        </div>
+
         <el-alert
             v-if="writeLogEnabled === false"
             type="warning"
@@ -166,10 +180,14 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { http } from '../api/http';
+
+const route = useRoute();
+const router = useRouter();
 
 const { t } = useI18n();
 
@@ -189,6 +207,7 @@ const filters = reactive({
     search: '',
     type: '',
     target_type: '',
+    target_id: '',
     range: null,
 });
 
@@ -203,6 +222,7 @@ function buildParams() {
         search: filters.search || undefined,
         type: filters.type || undefined,
         target_type: filters.target_type || undefined,
+        target_id: filters.target_id || undefined,
         page: pagination.page,
         per_page: pagination.perPage,
     };
@@ -298,6 +318,7 @@ async function deleteAll() {
             search: params.search,
             type: params.type,
             target_type: params.target_type,
+            target_id: params.target_id,
             from: params.from,
             to: params.to,
         });
@@ -315,5 +336,33 @@ async function deleteAll() {
     }
 }
 
-onMounted(fetchLogs);
+function clearTargetIdFilter() {
+    filters.target_id = '';
+    // Drop the query param from the URL too so refreshing won't re-apply it.
+    router.replace({ query: { ...route.query, target_id: undefined } });
+    pagination.page = 1;
+    fetchLogs();
+}
+
+// Pick up ?target_id=... from URL on entry (used by other pages linking
+// here, e.g. the per-row "View logs" button on Profiles.vue).
+watch(
+    () => route.query.target_id,
+    (id) => {
+        const next = typeof id === 'string' ? id : '';
+        if (next === filters.target_id) return;
+        filters.target_id = next;
+        pagination.page = 1;
+        fetchLogs();
+    },
+    { immediate: false }
+);
+
+onMounted(() => {
+    const initial = route.query.target_id;
+    if (typeof initial === 'string' && initial !== '') {
+        filters.target_id = initial;
+    }
+    fetchLogs();
+});
 </script>

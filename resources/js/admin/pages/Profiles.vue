@@ -231,13 +231,18 @@
                     </span>
                 </template>
             </el-table-column>
-            <el-table-column :label="t('common.actions')" width="180" fixed="right">
+            <el-table-column :label="t('common.actions')" width="220" fixed="right">
                 <template #default="{ row }">
                     <div
                         class="profile-actions"
                         style="display: flex; flex-wrap: nowrap; gap: 4px; justify-content: flex-start"
                     >
                         <template v-if="tab === 'active'">
+                            <el-tooltip :content="t('profiles.viewLogs')" placement="top" :show-after="300">
+                                <el-button size="small" plain @click="viewLogs(row)">
+                                    <el-icon><Document /></el-icon>
+                                </el-button>
+                            </el-tooltip>
                             <el-tooltip :content="t('common.edit')" placement="top" :show-after="300">
                                 <el-button size="small" type="primary" plain @click="openEdit(row)">
                                     <el-icon><Edit /></el-icon>
@@ -294,6 +299,12 @@
             type="profile"
             :ids="shareDialog.ids"
             :name="shareDialog.name"
+        />
+
+        <LogListDialog
+            v-model="logsDialog.visible"
+            :target-id="logsDialog.targetId"
+            :target-name="logsDialog.targetName"
         />
 
         <el-dialog
@@ -355,13 +366,22 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { http } from '../api/http';
 import ShareDialog from '../components/ShareDialog.vue';
+import LogListDialog from '../components/LogListDialog.vue';
 
 const { t } = useI18n();
+
+const logsDialog = reactive({ visible: false, targetId: '', targetName: '' });
+
+function viewLogs(row) {
+    logsDialog.targetId = row.id;
+    logsDialog.targetName = row.name;
+    logsDialog.visible = true;
+}
 
 const loading = ref(false);
 const rows = ref([]);

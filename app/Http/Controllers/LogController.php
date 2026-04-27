@@ -22,6 +22,7 @@ class LogController extends Controller
             'search' => $request->query('search'),
             'type' => $request->query('type'),
             'target_type' => $request->query('target_type'),
+            'target_id' => $request->query('target_id'),
             'from' => $request->query('from'),
             'to' => $request->query('to'),
             'per_page' => (int) $request->query('per_page', 20),
@@ -59,6 +60,7 @@ class LogController extends Controller
             'search' => $request->input('search'),
             'type' => $request->input('type'),
             'target_type' => $request->input('target_type'),
+            'target_id' => $request->input('target_id'),
             'from' => $request->input('from'),
             'to' => $request->input('to'),
         ];

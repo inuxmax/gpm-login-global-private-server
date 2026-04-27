@@ -239,6 +239,10 @@ class LogService
             $query->where('target_type', (string) $filters['target_type']);
         }
 
+        if (!empty($filters['target_id'])) {
+            $query->where('target_id', (string) $filters['target_id']);
+        }
+
         if (!empty($filters['from'])) {
             try {
                 $query->where('time', '>=', Carbon::parse($filters['from']));
