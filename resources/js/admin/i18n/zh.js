@@ -5,8 +5,13 @@ export default {
         switchToOldUi: '经典界面',
         logout: '退出登录',
         language: '语言',
+        themeLight: '浅色模式',
+        themeDark: '深色模式',
     },
     menu: {
+        groupOverview: '概览',
+        groupManagement: '管理',
+        groupSystem: '系统',
         systemSettings: '系统设置',
         users: '用户管理',
         groups: '组管理',

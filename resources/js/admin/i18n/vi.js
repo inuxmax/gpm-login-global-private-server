@@ -5,8 +5,13 @@ export default {
         switchToOldUi: 'Giao diện cũ',
         logout: 'Đăng xuất',
         language: 'Ngôn ngữ',
+        themeLight: 'Chế độ sáng',
+        themeDark: 'Chế độ tối',
     },
     menu: {
+        groupOverview: 'Tổng quan',
+        groupManagement: 'Quản lý',
+        groupSystem: 'Hệ thống',
         systemSettings: 'Cấu hình hệ thống',
         users: 'Quản lý người dùng',
         groups: 'Quản lý nhóm',

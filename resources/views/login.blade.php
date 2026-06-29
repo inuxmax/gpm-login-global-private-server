@@ -3,41 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GPM Global Private server — Sign in</title>
+    <title>GPM Global Private Server — Sign in</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --app-bg: #f5f7fa;
-            --card-bg: #ffffff;
-            --card-border: #e5e7eb;
-            --text-primary: #111827;
-            --text-secondary: #4b5563;
-            --text-muted: #9ca3af;
-            --primary: #1e40af;
-            --primary-dark: #1e3a8a;
-            --primary-light: #60a5fa;
-            --danger-bg: #fef2f2;
-            --danger-border: #fecaca;
-            --danger-text: #b91c1c;
-            --input-border: #d1d5db;
-            --input-focus: #60a5fa;
+            color-scheme: light;
+            --background: oklch(0.992 0.003 240);
+            --foreground: oklch(0.18 0.02 260);
+            --card: oklch(1 0 0);
+            --muted-foreground: oklch(0.48 0.015 250);
+            --border: oklch(0.92 0.005 250);
+            --brand: oklch(0.55 0.16 245);
+            --brand-dark: oklch(0.22 0.04 260);
+            --accent-dim: color-mix(in oklch, var(--brand) 18%, transparent);
+            --accent-glow: color-mix(in oklch, var(--brand) 32%, transparent);
+            --destructive: oklch(0.585 0.22 25);
+            --radius: 0.625rem;
+            --shadow-card: 0 4px 24px -8px oklch(0.25 0.04 260 / 10%);
+            --body-gradient:
+                radial-gradient(ellipse 120% 85% at 50% -30%, color-mix(in oklch, var(--brand) 10%, transparent), transparent 55%),
+                radial-gradient(ellipse 90% 50% at 100% 0%, color-mix(in oklch, var(--brand) 8%, transparent), transparent 48%),
+                radial-gradient(ellipse 70% 45% at 0% 100%, color-mix(in oklch, var(--brand) 7%, transparent), transparent 45%);
+            --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
         }
 
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
         html, body {
             margin: 0;
             padding: 0;
             min-height: 100vh;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
-                Arial, 'Noto Sans', sans-serif;
-            color: var(--text-primary);
-            background:
-                radial-gradient(ellipse at top left, rgba(96, 165, 250, 0.18), transparent 55%),
-                radial-gradient(ellipse at bottom right, rgba(30, 64, 175, 0.15), transparent 60%),
-                var(--app-bg);
+            font-family: var(--font-sans);
+            color: var(--foreground);
+            background: var(--background);
+            background-image: var(--body-gradient);
+            background-attachment: fixed;
+            -webkit-font-smoothing: antialiased;
         }
 
         .login-shell {
@@ -51,11 +55,24 @@
         .login-card {
             width: 100%;
             max-width: 420px;
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: calc(var(--radius) * 1.6);
+            box-shadow: var(--shadow-card);
             padding: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--brand-dark), var(--brand));
+            box-shadow: 0 6px 20px -4px var(--accent-glow);
         }
 
         .brand {
@@ -66,55 +83,55 @@
         }
 
         .brand-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            background: linear-gradient(180deg, var(--primary-dark) 0%, var(--primary) 100%);
+            width: 2rem;
+            height: 2rem;
+            border-radius: 0.5rem;
+            background: linear-gradient(135deg, var(--brand), color-mix(in oklch, var(--brand) 70%, oklch(0.55 0.14 245)));
             color: #fff;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 700;
-            font-size: 20px;
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 10px rgba(30, 64, 175, 0.25);
+            font-weight: 800;
+            font-size: 0.875rem;
+            box-shadow: 0 4px 14px -4px var(--accent-glow);
         }
 
         .brand-text .brand-title {
-            font-size: 16px;
-            font-weight: 700;
+            font-size: 0.8125rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
             line-height: 1.2;
-            color: var(--text-primary);
+            color: var(--foreground);
         }
 
         .brand-text .brand-subtitle {
-            font-size: 12px;
-            color: var(--text-muted);
+            font-size: 0.625rem;
+            color: var(--muted-foreground);
             margin-top: 2px;
+            font-weight: 500;
         }
 
         .form-title {
-            font-size: 20px;
-            font-weight: 600;
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
             margin: 0 0 6px;
-            color: var(--text-primary);
+            color: var(--foreground);
         }
 
         .form-subtitle {
-            font-size: 13px;
-            color: var(--text-secondary);
+            font-size: 0.8125rem;
+            color: var(--muted-foreground);
             margin: 0 0 24px;
         }
 
-        .field {
-            margin-bottom: 16px;
-        }
+        .field { margin-bottom: 16px; }
 
         .field label {
             display: block;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-secondary);
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: var(--muted-foreground);
             margin-bottom: 6px;
         }
 
@@ -123,26 +140,23 @@
             height: 40px;
             padding: 0 12px;
             font-size: 14px;
-            color: var(--text-primary);
-            background: #fff;
-            border: 1px solid var(--input-border);
-            border-radius: 8px;
+            font-family: inherit;
+            color: var(--foreground);
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
             outline: none;
             transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
 
-        .input:hover {
-            border-color: #9ca3af;
-        }
+        .input:hover { border-color: color-mix(in oklch, var(--brand) 25%, var(--border)); }
 
         .input:focus {
-            border-color: var(--input-focus);
-            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.18);
+            border-color: var(--brand);
+            box-shadow: 0 0 0 3px var(--accent-dim);
         }
 
-        .password-wrap {
-            position: relative;
-        }
+        .password-wrap { position: relative; }
 
         .password-toggle {
             position: absolute;
@@ -151,17 +165,18 @@
             transform: translateY(-50%);
             border: none;
             background: transparent;
-            color: var(--text-muted);
+            color: var(--muted-foreground);
             cursor: pointer;
             padding: 6px 8px;
             font-size: 12px;
-            font-weight: 500;
+            font-weight: 600;
             border-radius: 6px;
+            font-family: inherit;
         }
 
         .password-toggle:hover {
-            color: var(--primary);
-            background: rgba(96, 165, 250, 0.1);
+            color: var(--brand);
+            background: var(--accent-dim);
         }
 
         .submit-btn {
@@ -169,24 +184,23 @@
             height: 42px;
             margin-top: 8px;
             border: none;
-            border-radius: 8px;
-            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: var(--radius);
+            background: var(--brand);
             color: #fff;
             font-size: 14px;
             font-weight: 600;
-            letter-spacing: 0.2px;
+            font-family: inherit;
             cursor: pointer;
             transition: transform 0.05s ease, box-shadow 0.15s ease, opacity 0.15s ease;
-            box-shadow: 0 4px 10px rgba(30, 64, 175, 0.25);
+            box-shadow: 0 4px 14px -4px var(--accent-glow);
         }
 
         .submit-btn:hover {
-            box-shadow: 0 6px 14px rgba(30, 64, 175, 0.35);
+            background: color-mix(in oklch, var(--brand) 88%, black);
+            box-shadow: 0 6px 20px -4px var(--accent-glow);
         }
 
-        .submit-btn:active {
-            transform: translateY(1px);
-        }
+        .submit-btn:active { transform: translateY(1px); }
 
         .alert {
             display: flex;
@@ -194,24 +208,21 @@
             gap: 8px;
             margin-bottom: 16px;
             padding: 10px 12px;
-            background: var(--danger-bg);
-            border: 1px solid var(--danger-border);
-            color: var(--danger-text);
-            border-radius: 8px;
+            background: color-mix(in oklch, var(--destructive) 12%, transparent);
+            border: 1px solid color-mix(in oklch, var(--destructive) 35%, transparent);
+            color: var(--destructive);
+            border-radius: var(--radius);
             font-size: 13px;
             line-height: 1.4;
         }
 
-        .alert-icon {
-            flex-shrink: 0;
-            margin-top: 1px;
-        }
+        .alert-icon { flex-shrink: 0; margin-top: 1px; }
 
         .footnote {
             margin-top: 20px;
             text-align: center;
             font-size: 12px;
-            color: var(--text-muted);
+            color: var(--muted-foreground);
         }
     </style>
 </head>

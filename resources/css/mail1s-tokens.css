@@ -1,0 +1,144 @@
+/**
+ * Mail1s design tokens — adapted from F:/theme-mail1s/tokens.css
+ * Navy + Sky palette, sidebar tokens, semantic aliases.
+ */
+
+:root {
+    color-scheme: light;
+
+    --background: oklch(0.992 0.003 240);
+    --foreground: oklch(0.18 0.02 260);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.18 0.02 260);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.18 0.02 260);
+    --primary: oklch(0.22 0.04 260);
+    --primary-foreground: oklch(0.985 0 0);
+    --brand: oklch(0.55 0.16 245);
+    --brand-foreground: oklch(0.99 0 0);
+    --secondary: oklch(0.965 0.008 250);
+    --secondary-foreground: oklch(0.22 0.04 260);
+    --muted: oklch(0.965 0.005 250);
+    --muted-foreground: oklch(0.48 0.015 250);
+    --accent: oklch(0.55 0.16 245);
+    --accent-foreground: oklch(0.3 0.1 250);
+    --destructive: oklch(0.585 0.22 25);
+    --warning: oklch(0.78 0.15 75);
+    --warning-foreground: oklch(0.3 0.12 70);
+    --success: oklch(0.62 0.16 155);
+    --success-foreground: oklch(0.99 0 0);
+    --info: oklch(0.65 0.13 230);
+    --info-foreground: oklch(0.99 0 0);
+    --border: oklch(0.92 0.005 250);
+    --input: oklch(0.92 0.005 250);
+    --ring: oklch(0.55 0.13 245);
+    --radius: 0.625rem;
+
+    --sidebar: oklch(1 0 0);
+    --sidebar-foreground: oklch(0.3 0.025 260);
+    --sidebar-primary: oklch(0.22 0.04 260);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.95 0.025 245);
+    --sidebar-accent-foreground: oklch(0.22 0.08 245);
+    --sidebar-border: oklch(0.92 0.005 250);
+    --sidebar-ring: oklch(0.55 0.13 245);
+
+    --accent-ui: var(--brand);
+    --accent-dim: color-mix(in oklch, var(--brand) 18%, transparent);
+    --accent-glow: color-mix(in oklch, var(--brand) 32%, transparent);
+    --shadow-card: 0 4px 24px -8px oklch(0.25 0.04 260 / 10%);
+    --header-shadow: 0 4px 24px -10px oklch(0.25 0.04 260 / 12%);
+    --body-gradient:
+        radial-gradient(ellipse 120% 85% at 50% -30%, color-mix(in oklch, var(--brand) 10%, transparent), transparent 55%),
+        radial-gradient(ellipse 90% 50% at 100% 0%, color-mix(in oklch, var(--info) 8%, transparent), transparent 48%),
+        radial-gradient(ellipse 70% 45% at 0% 100%, color-mix(in oklch, var(--brand) 7%, transparent), transparent 45%);
+    --card-top-accent: linear-gradient(90deg, color-mix(in oklch, var(--brand) 85%, black), var(--brand), var(--info));
+    --selection-bg: color-mix(in oklch, var(--brand) 22%, transparent);
+    --selection-fg: var(--foreground);
+    --input-bg: var(--background);
+    --hover-bg: color-mix(in oklch, var(--foreground) 5%, var(--card));
+
+    --app-sidebar-width: 15rem;
+    --app-header-height: 4rem;
+    --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --font-heading: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+    /* Element Plus bridge (hex approximations of brand) */
+    --el-color-primary: #3b82f6;
+    --el-color-primary-light-3: #79a8f5;
+    --el-color-primary-light-5: #9bbef7;
+    --el-color-primary-light-7: #bdd4f9;
+    --el-color-primary-light-8: #cedffb;
+    --el-color-primary-light-9: #e0ebfd;
+    --el-color-primary-dark-2: #2563eb;
+    --el-border-radius-base: 10px;
+    --el-bg-color: var(--card);
+    --el-bg-color-page: var(--background);
+    --el-text-color-primary: var(--foreground);
+    --el-text-color-regular: color-mix(in oklch, var(--foreground) 78%, var(--muted-foreground));
+    --el-border-color: var(--border);
+    --el-fill-color-blank: var(--input-bg);
+}
+
+.dark {
+    color-scheme: dark;
+
+    --background: oklch(0.155 0.015 260);
+    --foreground: oklch(0.96 0.005 250);
+    --card: oklch(0.2 0.018 260);
+    --card-foreground: oklch(0.96 0.005 250);
+    --popover: oklch(0.2 0.018 260);
+    --popover-foreground: oklch(0.96 0.005 250);
+    --primary: oklch(0.92 0.005 250);
+    --primary-foreground: oklch(0.2 0.03 260);
+    --brand: oklch(0.68 0.16 245);
+    --brand-foreground: oklch(0.18 0.04 260);
+    --secondary: oklch(0.27 0.02 260);
+    --secondary-foreground: oklch(0.96 0.005 250);
+    --muted: oklch(0.26 0.015 260);
+    --muted-foreground: oklch(0.72 0.01 250);
+    --accent: oklch(0.68 0.16 245);
+    --accent-foreground: oklch(0.92 0.04 245);
+    --destructive: oklch(0.7 0.2 22);
+    --warning: oklch(0.8 0.15 75);
+    --success: oklch(0.7 0.16 155);
+    --info: oklch(0.7 0.14 230);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 14%);
+    --ring: oklch(0.65 0.14 245);
+
+    --sidebar: oklch(0.18 0.02 260);
+    --sidebar-foreground: oklch(0.85 0.01 250);
+    --sidebar-primary: oklch(0.68 0.16 245);
+    --sidebar-accent: oklch(0.26 0.025 250);
+    --sidebar-accent-foreground: oklch(0.92 0.04 245);
+    --sidebar-border: oklch(1 0 0 / 10%);
+    --sidebar-ring: oklch(0.65 0.14 245);
+
+    --shadow-card: 0 4px 24px -8px oklch(0 0 0 / 40%);
+    --header-shadow: 0 1px 0 oklch(1 0 0 / 6%);
+    --body-gradient:
+        radial-gradient(ellipse 130% 90% at 50% -35%, color-mix(in oklch, var(--brand) 14%, transparent), transparent 58%),
+        radial-gradient(ellipse 80% 55% at 100% 8%, color-mix(in oklch, var(--info) 9%, transparent), transparent 50%);
+    --input-bg: color-mix(in oklch, var(--card) 70%, var(--background));
+
+    --el-color-primary: #60a5fa;
+    --el-color-primary-dark-2: #3b82f6;
+    --el-bg-color: var(--card);
+    --el-bg-color-page: var(--background);
+    --el-text-color-primary: var(--foreground);
+    --el-border-color: var(--border);
+    --el-fill-color-blank: var(--input-bg);
+}
+
+::selection {
+    background: var(--selection-bg);
+    color: var(--selection-fg);
+}
+
+.mail1s-page-grid {
+    background-image:
+        linear-gradient(to right, color-mix(in oklch, var(--border) 60%, transparent) 1px, transparent 1px),
+        linear-gradient(to bottom, color-mix(in oklch, var(--border) 60%, transparent) 1px, transparent 1px);
+    background-size: 56px 56px;
+}

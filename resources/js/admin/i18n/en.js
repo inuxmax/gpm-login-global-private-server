@@ -5,8 +5,13 @@ export default {
         switchToOldUi: 'Classic UI',
         logout: 'Logout',
         language: 'Language',
+        themeLight: 'Light mode',
+        themeDark: 'Dark mode',
     },
     menu: {
+        groupOverview: 'Overview',
+        groupManagement: 'Management',
+        groupSystem: 'System',
         systemSettings: 'System settings',
         users: 'User management',
         groups: 'Groups',
