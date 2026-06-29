@@ -2,12 +2,14 @@
 
 ## Cấu hình Application (Dockerfile)
 
-| Trường | Giá trị |
-|--------|---------|
-| Build Type | Dockerfile |
-| Docker File | `Dockerfile` (không có `/` đầu) |
-| Docker Context Path | `.` |
-| Port | `80` |
+
+| Trường              | Giá trị                         |
+| ------------------- | ------------------------------- |
+| Build Type          | Dockerfile                      |
+| Docker File         | `Dockerfile` (không có `/` đầu) |
+| Docker Context Path | `.`                             |
+| Port                | `80`                            |
+
 
 ## Biến môi trường tối thiểu
 
@@ -48,10 +50,41 @@ Tạo token: GitHub → Settings → Developer settings → Personal access toke
 
 ### Sau deploy lần đầu
 
-Vào container hoặc dùng terminal Dokploy:
+**Bắt buộc** chạy migration — nếu không sẽ lỗi:
 
-```bash
-php artisan migrate --force
+```
+Table 'mysql.users' doesn't exist
 ```
 
+Trang `/` hiển thị "Kết nối database thất bại" nhưng thực tế là **DB đã kết nối OK**, chỉ thiếu bảng.
+
+Vào **Open Terminal** trên service app (gpm), chạy:
+
+```bash
+cd /var/www/html && php artisan migrate --force && php artisan db:seed --force
+```
+
+
+
+Tài khoản admin mặc định sau seed:
+
+- Email: `Administrator`
+- Password: `Administrator`
+
 Admin UI: `https://your-domain.com/admin/app`
+
+### Kiểm tra env DB khớp với Dokploy Database
+
+Trong Dokploy → Database → **Internal Credentials**, copy chính xác:
+
+
+| Biến app      | Lấy từ Dokploy                            |
+| ------------- | ----------------------------------------- |
+| `DB_HOST`     | **Internal Host** (vd. `mailfo-db-xxxxx`) |
+| `DB_PORT`     | `3306`                                    |
+| `DB_DATABASE` | **Database Name**                         |
+| `DB_USERNAME` | **User**                                  |
+| `DB_PASSWORD` | **Password**                              |
+
+
+`DB_HOST` phải là hostname **nội bộ** Dokploy cấp, không phải `127.0.0.1`.
