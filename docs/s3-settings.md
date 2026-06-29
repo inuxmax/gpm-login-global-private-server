@@ -14,7 +14,15 @@
 
 - **AWS S3 thuần**: để trống Custom URL, chỉ chọn region AWS.
 - **DigitalOcean Spaces**: nhập endpoint, vd. `https://sgp1.digitaloceanspaces.com`, region chọn hoặc nhập `sgp1`.
-- **MinIO / Cloudflare R2 / Wasabi**: nhập endpoint do nhà cung cấp cung cấp.
+- **MinIO / Cloudflare R2 / Wasabi / CloudFly**: nhập endpoint do nhà cung cấp cung cấp (vd. `s3.cloudfly.vn` — hệ thống tự thêm `https://`).
+
+## Kiểm tra kết nối
+
+Admin → **Cấu hình hệ thống** → chọn **S3** → nhập Key/Secret/Bucket/Region/Endpoint → bấm **Kiểm tra kết nối S3**.
+
+- Test dùng giá trị **đang nhập trên form** (chưa cần bấm Áp dụng).
+- API: `POST /admin/api/settings/test-s3` (admin session).
+- Thành công: gọi `HeadBucket` lên bucket đã cấu hình.
 
 ## Tương thích ngược
 

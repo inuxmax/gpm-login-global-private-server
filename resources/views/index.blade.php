@@ -53,7 +53,6 @@
         <a class="badge bg-danger" href="{{ url('admin/auth/logout') }}">Logout</a>
         &nbsp;<a href="{{ url('admin/reset-profile-status') }}" class="badge bg-success">Reset profile status</a>
         &nbsp;<a href="{{ url('admin/migration') }}" class="badge bg-secondary">Migration database</a>
-        &nbsp;<a href="{{ url('auto-update') }}" class="badge bg-secondary">Update private server</a>
         &nbsp;<a href="{{ url('admin/app/system') }}" class="badge bg-success">New GUI</a>
         <br /><br /><br />
 

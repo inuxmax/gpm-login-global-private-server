@@ -97,9 +97,21 @@
                     <div style="white-space: pre-line">{{ t('settings.cacheExtensionDetails') }}</div>
                 </el-alert>
 
-                <el-button type="primary" :loading="saving" @click="save">
-                    {{ t('common.apply') }}
-                </el-button>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap">
+                    <el-button type="primary" :loading="saving" @click="save">
+                        {{ t('common.apply') }}
+                    </el-button>
+                    <el-button
+                        v-if="form.storage_type === 's3'"
+                        type="success"
+                        plain
+                        :loading="testingS3"
+                        @click="testS3Connection"
+                    >
+                        <el-icon style="margin-right: 4px"><Connection /></el-icon>
+                        {{ t('settings.testS3Connection') }}
+                    </el-button>
+                </div>
             </el-form>
         </div>
 
@@ -123,11 +135,6 @@
                 <el-button type="warning" plain :loading="migrating" @click="runMigration">
                     <el-icon style="margin-right: 4px"><DataBoard /></el-icon>
                     {{ t('settings.runMigration') }}
-                </el-button>
-
-                <el-button type="info" plain @click="autoUpdate">
-                    <el-icon style="margin-right: 4px"><Upload /></el-icon>
-                    {{ t('settings.autoUpdate') }}
                 </el-button>
 
                 <el-upload
@@ -154,7 +161,6 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 import { http } from '../api/http';
 
 const { t } = useI18n();
-const config = window.__APP_CONFIG__ || {};
 
 const standardRegions = [
     'APEast1', 'AFSouth1', 'APNortheast1', 'APNortheast2', 'APNortheast3',
@@ -167,6 +173,7 @@ const standardRegions = [
 
 const loading = ref(false);
 const saving = ref(false);
+const testingS3 = ref(false);
 const resettingStatus = ref(false);
 const migrating = ref(false);
 const customRegion = ref(false);
@@ -221,6 +228,39 @@ async function save() {
     }
 }
 
+async function testS3Connection() {
+    if (!form.s3.S3_KEY?.trim() || !form.s3.S3_PASSWORD?.trim() || !form.s3.S3_BUCKET?.trim()) {
+        ElMessage.warning(t('settings.s3TestMissingFields'));
+        return;
+    }
+
+    testingS3.value = true;
+    try {
+        const { data } = await http.post('/settings/test-s3', {
+            S3_KEY: form.s3.S3_KEY,
+            S3_PASSWORD: form.s3.S3_PASSWORD,
+            S3_BUCKET: form.s3.S3_BUCKET,
+            S3_REGION: form.s3.S3_REGION,
+            S3_ENDPOINT: form.s3.S3_ENDPOINT,
+        });
+        if (data?.success) {
+            ElMessage.success(
+                t('settings.s3TestSuccess', { duration: data.data?.duration_ms ?? '?' })
+            );
+        } else {
+            const detail = data?.data?.detail ? `: ${data.data.detail}` : '';
+            ElMessage.error((t('settings.s3TestFailed')) + detail);
+        }
+    } catch (err) {
+        const detail = err?.response?.data?.data?.detail;
+        ElMessage.error(
+            detail ? `${t('settings.s3TestFailed')}: ${detail}` : t('common.error')
+        );
+    } finally {
+        testingS3.value = false;
+    }
+}
+
 async function resetProfileStatus() {
     try {
         await ElMessageBox.confirm(t('settings.resetProfileStatusConfirm'), t('common.confirm'), {
@@ -258,18 +298,6 @@ async function runMigration() {
     } finally {
         migrating.value = false;
     }
-}
-
-async function autoUpdate() {
-    try {
-        await ElMessageBox.confirm(t('settings.autoUpdateConfirm'), t('common.confirm'), {
-            type: 'warning',
-        });
-    } catch {
-        return;
-    }
-    // Auto-update page is a GET endpoint that streams its own response — open it.
-    window.open(`${config.baseUrl}/auto-update`, '_blank');
 }
 
 async function onUpdateFileSelected(uploadFile) {

@@ -10,6 +10,7 @@ use App\Services\AdminService;
 use App\Services\LogService;
 use App\Services\SettingService;
 use App\Services\WebAuthService;
+use App\Services\S3UploadService;
 
 class AdminApiController extends Controller
 {
@@ -17,17 +18,20 @@ class AdminApiController extends Controller
     protected $settingService;
     protected $webAuthService;
     protected $logService;
+    protected $s3UploadService;
 
     public function __construct(
         AdminService $adminService,
         SettingService $settingService,
         WebAuthService $webAuthService,
-        LogService $logService
+        LogService $logService,
+        S3UploadService $s3UploadService
     ) {
         $this->adminService = $adminService;
         $this->settingService = $settingService;
         $this->webAuthService = $webAuthService;
         $this->logService = $logService;
+        $this->s3UploadService = $s3UploadService;
     }
 
     public function me(Request $request)
@@ -86,6 +90,19 @@ class AdminApiController extends Controller
         );
 
         return response()->json(['success' => true, 'message' => $message]);
+    }
+
+    public function testS3Connection(Request $request)
+    {
+        $result = $this->s3UploadService->testConnection([
+            's3_api_key' => $request->input('S3_KEY', ''),
+            's3_api_secret' => $request->input('S3_PASSWORD', ''),
+            's3_api_bucket' => $request->input('S3_BUCKET', ''),
+            's3_api_region' => $request->input('S3_REGION', ''),
+            's3_api_endpoint' => $request->input('S3_ENDPOINT', ''),
+        ]);
+
+        return response()->json($result, $result['success'] ? 200 : 422);
     }
 
     public function getUsers(Request $request)

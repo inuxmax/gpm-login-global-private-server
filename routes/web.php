@@ -51,10 +51,6 @@ Route::middleware(['auth:sanctum'])->get('/phpinfo', function () {
     phpinfo();
 });
 
-Route::middleware(['auth:sanctum'])->group(function () {
-    Route::get('/auto-update', [UpdateController::class, 'updateFromRemoteZip']);
-});
-
 // ========================================
 // New SPA (Vue 3) admin UI
 // ========================================
@@ -70,6 +66,7 @@ Route::middleware(['admin.only'])->group(function () {
 
         Route::get('/settings', [AdminApiController::class, 'getSettings']);
         Route::post('/settings', [AdminApiController::class, 'saveSettings']);
+        Route::post('/settings/test-s3', [AdminApiController::class, 'testS3Connection']);
 
         Route::get('/users', [AdminApiController::class, 'getUsers']);
         Route::post('/users/{id}/toggle-active', [AdminApiController::class, 'toggleActiveUser']);

@@ -34,15 +34,82 @@ class S3UploadService
     {
         $custom = trim($s3Data['s3_api_endpoint'] ?? '');
         if ($custom !== '') {
-            return $custom;
+            return $this->normalizeEndpoint($custom);
         }
 
         $region = $s3Data['s3_api_region'] ?? '';
         if ($this->getDORegion($region) !== null) {
-            return $region;
+            return $this->normalizeEndpoint($region);
         }
 
         return null;
+    }
+
+    /**
+     * Verify credentials and bucket access (HeadBucket).
+     */
+    public function testConnection(array $s3Data): array
+    {
+        $key = trim($s3Data['s3_api_key'] ?? '');
+        $secret = trim($s3Data['s3_api_secret'] ?? '');
+        $bucket = trim($s3Data['s3_api_bucket'] ?? '');
+        $region = trim($s3Data['s3_api_region'] ?? '');
+
+        if ($key === '' || $secret === '' || $bucket === '') {
+            return [
+                'success' => false,
+                'message' => 's3_test_missing_fields',
+                'data' => null,
+            ];
+        }
+
+        try {
+            $client = $this->createS3Client([
+                's3_api_key' => $key,
+                's3_api_secret' => $secret,
+                's3_api_bucket' => $bucket,
+                's3_api_region' => $region !== '' ? $region : 'USEast1',
+                's3_api_endpoint' => $s3Data['s3_api_endpoint'] ?? '',
+            ]);
+
+            $start = microtime(true);
+            $client->headBucket(['Bucket' => $bucket]);
+            $durationMs = round((microtime(true) - $start) * 1000, 1);
+
+            return [
+                'success' => true,
+                'message' => 's3_test_ok',
+                'data' => [
+                    'bucket' => $bucket,
+                    'duration_ms' => $durationMs,
+                ],
+            ];
+        } catch (AwsException $e) {
+            return [
+                'success' => false,
+                'message' => 's3_test_failed',
+                'data' => [
+                    'detail' => $e->getAwsErrorMessage() ?: $e->getMessage(),
+                ],
+            ];
+        } catch (\Throwable $e) {
+            return [
+                'success' => false,
+                'message' => 's3_test_failed',
+                'data' => [
+                    'detail' => $e->getMessage(),
+                ],
+            ];
+        }
+    }
+
+    private function normalizeEndpoint(string $endpoint): string
+    {
+        $endpoint = trim($endpoint);
+        if ($endpoint !== '' && !preg_match('#^https?://#i', $endpoint)) {
+            $endpoint = 'https://' . $endpoint;
+        }
+        return $endpoint;
     }
 
     /**
