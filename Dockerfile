@@ -55,15 +55,31 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
 
+ENV COMPOSER_ALLOW_SUPERUSER=1 \
+    COMPOSER_MAX_PARALLEL_HTTP=3
+
 # Prime the package cache with composer metadata only (better layer caching)
 COPY composer.json composer.lock ./
-RUN composer install \
-        --no-dev \
-        --no-scripts \
-        --no-autoloader \
-        --prefer-dist \
-        --no-interaction \
-        --no-progress
+# prefer-dist is faster but GitHub codeload often returns HTTP 400 on CI/VPS builds;
+# retry a few times then fall back to git clone (--prefer-source).
+RUN set -e; \
+    install_deps() { \
+        composer install \
+            --no-dev \
+            --no-scripts \
+            --no-autoloader \
+            "$@" \
+            --no-interaction \
+            --no-progress; \
+    }; \
+    for attempt in 1 2 3; do \
+        echo "[composer] install attempt ${attempt} (--prefer-dist)"; \
+        install_deps --prefer-dist && exit 0; \
+        echo "[composer] attempt ${attempt} failed, waiting 20s..."; \
+        sleep 20; \
+    done; \
+    echo "[composer] falling back to --prefer-source (git clone)"; \
+    install_deps --prefer-source
 
 # Copy the rest of the Laravel source and finalise the autoloader
 COPY . .
