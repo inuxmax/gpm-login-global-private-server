@@ -6,6 +6,7 @@ use Tests\TestCase;
 use Illuminate\Support\Facades\Cache;
 use App\Services\S3PresignedUrlService;
 use App\Services\SettingService;
+use App\Services\S3UploadService;
 use App\Models\Setting;
 use App\Models\User;
 
@@ -21,7 +22,10 @@ class S3PresignedUrlTest extends TestCase
         parent::setUp();
         
         $this->settingService = new SettingService();
-        $this->s3PresignedUrlService = new S3PresignedUrlService($this->settingService);
+        $this->s3PresignedUrlService = new S3PresignedUrlService(
+            $this->settingService,
+            new S3UploadService($this->settingService)
+        );
         
         // Set up mock S3 settings
         $this->setupMockS3Settings();
@@ -61,6 +65,10 @@ class S3PresignedUrlTest extends TestCase
         Setting::firstOrCreate(
             ['name' => 's3_region'],
             ['value' => 'us-east-1']
+        );
+        Setting::firstOrCreate(
+            ['name' => 's3_endpoint'],
+            ['value' => '']
         );
     }
 

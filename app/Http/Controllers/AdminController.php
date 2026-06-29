@@ -55,6 +55,7 @@ class AdminController extends Controller
             $request->S3_PASSWORD,
             $request->S3_BUCKET,
             $request->S3_REGION,
+            $request->S3_ENDPOINT,
             $request->cache_extension ? 'on' : 'off'
         );
 

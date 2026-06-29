@@ -124,10 +124,11 @@ class AdminService
      * @param string|null $s3Password
      * @param string|null $s3Bucket
      * @param string|null $s3Region
+     * @param string|null $s3Endpoint
      * @param string $cacheExtension
      * @return string
      */
-    public function saveSettings(string $type, ?string $s3Key = null, ?string $s3Password = null, ?string $s3Bucket = null, ?string $s3Region = null, string $cacheExtension = 'off', ?string $writeLog = null)
+    public function saveSettings(string $type, ?string $s3Key = null, ?string $s3Password = null, ?string $s3Bucket = null, ?string $s3Region = null, ?string $s3Endpoint = null, string $cacheExtension = 'off', ?string $writeLog = null)
     {
         // Save storage type setting
         $this->settingService->setSetting('storage_type', $type);
@@ -143,7 +144,8 @@ class AdminService
                 'S3_KEY' => $s3Key ?? '',
                 'S3_PASSWORD' => $s3Password ?? '',
                 'S3_BUCKET' => $s3Bucket ?? '',
-                'S3_REGION' => $s3Region ?? ''
+                'S3_REGION' => $s3Region ?? '',
+                'S3_ENDPOINT' => $s3Endpoint ?? '',
             ];
             $this->settingService->updateS3Settings($s3Data);
         }

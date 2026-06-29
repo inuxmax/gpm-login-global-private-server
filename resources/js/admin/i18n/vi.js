@@ -73,6 +73,8 @@ export default {
         s3Bucket: 'S3 Bucket',
         s3Region: 'S3 Region',
         customRegion: 'Tuỳ chỉnh region',
+        s3Endpoint: 'S3 Custom URL (Endpoint)',
+        s3EndpointPlaceholder: 'https://sgp1.digitaloceanspaces.com — để trống nếu dùng AWS S3',
         cacheExtension: 'Bật cache extension',
         cacheExtensionDetails:
             'Áp dụng cho profile tạo từ 26/09/2024. Extension sẽ được upload và lưu trên private server (file có prefix cache_) thay vì lưu trong profile — giúp tiết kiệm dung lượng, giảm thời gian tải và tăng tốc mở profile. Quản trị viên private server chịu trách nhiệm bật/tắt tính năng này.',

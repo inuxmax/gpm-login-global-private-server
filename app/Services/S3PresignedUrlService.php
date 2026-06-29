@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use Aws\S3\S3Client;
 use Illuminate\Support\Facades\Cache;
 use Carbon\Carbon;
 use Exception;
@@ -10,10 +9,12 @@ use Exception;
 class S3PresignedUrlService
 {
     protected $settingService;
+    protected $s3UploadService;
 
-    public function __construct(SettingService $settingService)
+    public function __construct(SettingService $settingService, S3UploadService $s3UploadService)
     {
         $this->settingService = $settingService;
+        $this->s3UploadService = $s3UploadService;
     }
 
     public function getS3PresignedUrl(string $type, string $sessionId): array
@@ -114,14 +115,7 @@ class S3PresignedUrlService
             }
 
             // Create S3 client
-            $s3Client = new S3Client([
-                'version' => 'latest',
-                'region' => $s3Data['s3_api_region'],
-                'credentials' => [
-                    'key' => $s3Data['s3_api_key'],
-                    'secret' => $s3Data['s3_api_secret'],
-                ],
-            ]);
+            $s3Client = $this->s3UploadService->createS3Client($s3Data);
 
             // Get presigned URL duration from environment (default 120 minutes)
             $durationMinutes = env('S3_PRESIGNED_URL_DURATION_MINUTES', 120);

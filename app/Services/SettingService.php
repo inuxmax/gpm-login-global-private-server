@@ -21,6 +21,7 @@ class SettingService
             's3_secret' => '',
             's3_bucket' => '',
             's3_region' => '',
+            's3_endpoint' => '',
             'cache_extension' => 'off',
             'write_log' => 'off',
         ];
@@ -42,12 +43,14 @@ class SettingService
             $apiSecret = $this->getSetting('s3_secret')?->value ?? '';
             $apiBucket = $this->getSetting('s3_bucket')?->value ?? '';
             $apiRegion = $this->getSetting('s3_region')?->value ?? '';
+            $apiEndpoint = $this->getSetting('s3_endpoint')?->value ?? '';
 
             $settings = [
                 's3_api_key' => $apiKey,
                 's3_api_secret' => $apiSecret,
                 's3_api_bucket' => $apiBucket,
-                's3_api_region' => $apiRegion
+                's3_api_region' => $apiRegion,
+                's3_api_endpoint' => $apiEndpoint,
             ];
 
             return ['success' => true, 'message' => 'ok', 'data' => $settings];
@@ -65,7 +68,8 @@ class SettingService
             'S3_KEY' => $this->getSetting('s3_key')?->value ?? '',
             'S3_PASSWORD' => $this->getSetting('s3_secret')?->value ?? '',
             'S3_BUCKET' => $this->getSetting('s3_bucket')?->value ?? '',
-            'S3_REGION' => $this->getSetting('s3_region')?->value ?? ''
+            'S3_REGION' => $this->getSetting('s3_region')?->value ?? '',
+            'S3_ENDPOINT' => $this->getSetting('s3_endpoint')?->value ?? '',
         ];
     }
 
@@ -103,6 +107,7 @@ class SettingService
                 $this->setSetting('s3_secret', $s3Data['S3_PASSWORD'] ?? '');
                 $this->setSetting('s3_bucket', $s3Data['S3_BUCKET'] ?? '');
                 $this->setSetting('s3_region', $s3Data['S3_REGION'] ?? '');
+                $this->setSetting('s3_endpoint', $s3Data['S3_ENDPOINT'] ?? '');
 
                 return ['success' => true, 'message' => 's3_settings_updated'];
             } catch (\Exception $ex) {

@@ -73,6 +73,8 @@ export default {
         s3Bucket: 'S3 Bucket',
         s3Region: 'S3 Region',
         customRegion: '自定义区域',
+        s3Endpoint: 'S3 自定义 URL (Endpoint)',
+        s3EndpointPlaceholder: 'https://sgp1.digitaloceanspaces.com — 使用默认 AWS S3 时留空',
         cacheExtension: '启用扩展缓存',
         cacheExtensionDetails:
             '适用于 2024 年 9 月 26 日之后创建的配置文件。扩展将上传并存储到私有服务器（文件前缀 cache_），而不是保存在每个配置文件中——节省存储空间、缩短加载时间并提升启动速度。私有服务器管理员负责启用或关闭此功能。',

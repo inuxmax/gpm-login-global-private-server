@@ -54,6 +54,15 @@
                                     </div>
                                 </el-form-item>
                             </el-col>
+                            <el-col :md="24" :sm="24">
+                                <el-form-item :label="t('settings.s3Endpoint')">
+                                    <el-input
+                                        v-model="form.s3.S3_ENDPOINT"
+                                        :placeholder="t('settings.s3EndpointPlaceholder')"
+                                        clearable
+                                    />
+                                </el-form-item>
+                            </el-col>
                         </el-row>
                     </div>
                 </el-collapse-transition>
@@ -167,7 +176,7 @@ const uploadRef = ref(null);
 
 const form = reactive({
     storage_type: 'local',
-    s3: { S3_KEY: '', S3_PASSWORD: '', S3_BUCKET: '', S3_REGION: '' },
+    s3: { S3_KEY: '', S3_PASSWORD: '', S3_BUCKET: '', S3_REGION: '', S3_ENDPOINT: '' },
     cache_extension: false,
     write_log: false,
 });
@@ -201,6 +210,7 @@ async function save() {
             S3_PASSWORD: form.s3.S3_PASSWORD,
             S3_BUCKET: form.s3.S3_BUCKET,
             S3_REGION: form.s3.S3_REGION,
+            S3_ENDPOINT: form.s3.S3_ENDPOINT,
         };
         const { data } = await http.post('/settings', payload);
         ElMessage.success(data?.message || t('settings.saved'));

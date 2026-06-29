@@ -270,17 +270,21 @@ class UploadService
         $s3Secret = $this->settingService->getSetting('s3_secret')->value ?? '';
         $s3Bucket = $this->settingService->getSetting('s3_bucket')->value ?? '';
         $s3Region = $this->settingService->getSetting('s3_region')->value ?? '';
-        $s3RegionCode = $s3UploadService->getS3RegionCode($this->settingService->getSetting('s3_region')->value ?? '');
-
-        $isDO = $s3UploadService->getDORegion($s3Region) != null;
+        $s3Endpoint = $this->settingService->getSetting('s3_endpoint')?->value ?? '';
+        $s3RegionCode = $s3UploadService->getS3RegionCode($s3Region);
 
         config(['filesystems.disks.s3.key' => $s3Key]);
         config(['filesystems.disks.s3.secret' => $s3Secret]);
         config(['filesystems.disks.s3.bucket' => $s3Bucket]);
         config(['filesystems.disks.s3.region' => $s3RegionCode]);
-        if($isDO)
-            config(['filesystems.disks.s3.endpoint' => $s3Region]);
-        // config(['filesystems.disks.s3.url' => $s3Url]);
+
+        $endpoint = $s3UploadService->resolveEndpoint([
+            's3_api_region' => $s3Region,
+            's3_api_endpoint' => $s3Endpoint,
+        ]);
+        if ($endpoint !== null) {
+            config(['filesystems.disks.s3.endpoint' => $endpoint]);
+        }
     }
 
     /**

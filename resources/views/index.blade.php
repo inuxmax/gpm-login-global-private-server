@@ -111,6 +111,15 @@
                         </select>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="mb-3 col-md-12">
+                        <label class="form-label" for="S3_ENDPOINT">S3_ENDPOINT (Custom URL)</label>
+                        <input name="S3_ENDPOINT" class="form-control" id="S3_ENDPOINT"
+                            placeholder="https://sgp1.digitaloceanspaces.com hoặc MinIO/R2 endpoint"
+                            value="{{ $s3Config->S3_ENDPOINT ?? '' }}" />
+                        <div class="form-text">Tuỳ chọn — dùng cho S3-compatible (DigitalOcean Spaces, MinIO, Cloudflare R2...). Để trống nếu dùng AWS S3 mặc định.</div>
+                    </div>
+                </div>
             </div>
 
             <!-- cache extension -->

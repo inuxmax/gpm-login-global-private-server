@@ -20,6 +20,7 @@ class SettingsSeeder extends Seeder
             's3_secret' => '',
             's3_bucket' => '',
             's3_region' => '',
+            's3_endpoint' => '',
             'cache_extension' => 'off'
         ];
 

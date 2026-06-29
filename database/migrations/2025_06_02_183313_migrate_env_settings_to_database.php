@@ -21,6 +21,7 @@ return new class extends Migration
             's3_secret' => env('S3_PASSWORD', ''),
             's3_bucket' => env('S3_BUCKET', ''),
             's3_region' => env('S3_REGION', ''),
+            's3_endpoint' => env('S3_ENDPOINT', ''),
             'cache_extension' => 'off'
         ];
 
@@ -63,7 +64,8 @@ return new class extends Migration
             's3_key',
             's3_secret',
             's3_bucket',
-            's3_region'
+            's3_region',
+            's3_endpoint'
         ];
 
         Setting::whereIn('name', $settingsToRemove)->delete();
