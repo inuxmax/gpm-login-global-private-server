@@ -1,78 +1,78 @@
 <template>
-    <div class="page-card">
-        <div class="page-card-title" style="justify-content: space-between; display: flex">
-            <div style="display: flex; align-items: center; gap: 8px">
-                <el-icon><Document /></el-icon>
-                {{ t('logs.title') }}
-            </div>
-            <div style="display: flex; gap: 8px; flex-wrap: wrap">
-                <el-input
-                    v-model="filters.search"
-                    :placeholder="t('common.searchPlaceholder')"
-                    size="default"
-                    style="width: 220px"
-                    clearable
-                    @input="onSearch"
-                    @clear="fetchLogs"
-                >
-                    <template #prefix>
-                        <el-icon><Search /></el-icon>
-                    </template>
-                </el-input>
+    <div class="admin-page">
+        <AdminPageHeader
+            icon="Document"
+            tone="amber"
+            :title="t('logs.title')"
+            :subtitle="t('logs.pageSubtitle')"
+        />
 
-                <el-select
-                    v-model="filters.type"
-                    :placeholder="t('logs.typeAll')"
-                    size="default"
-                    style="width: 140px"
-                    clearable
-                    @change="fetchLogs"
-                >
-                    <el-option :label="t('logs.typeInfo')" value="info" />
-                    <el-option :label="t('logs.typeWarn')" value="warn" />
-                    <el-option :label="t('logs.typeError')" value="error" />
-                </el-select>
+        <div class="page-card admin-page-body">
+        <AdminToolbar>
+            <el-input
+                v-model="filters.search"
+                :placeholder="t('common.searchPlaceholder')"
+                style="width: 220px"
+                clearable
+                @input="onSearch"
+                @clear="fetchLogs"
+            >
+                <template #prefix>
+                    <el-icon><Search /></el-icon>
+                </template>
+            </el-input>
 
-                <el-select
-                    v-model="filters.target_type"
-                    :placeholder="t('logs.targetTypeAll')"
-                    size="default"
-                    style="width: 160px"
-                    clearable
-                    @change="fetchLogs"
-                >
-                    <el-option
-                        v-for="opt in targetTypeOptions"
-                        :key="opt.value"
-                        :label="opt.label"
-                        :value="opt.value"
-                    />
-                </el-select>
+            <el-select
+                v-model="filters.type"
+                :placeholder="t('logs.typeAll')"
+                style="width: 140px"
+                clearable
+                @change="fetchLogs"
+            >
+                <el-option :label="t('logs.typeInfo')" value="info" />
+                <el-option :label="t('logs.typeWarn')" value="warn" />
+                <el-option :label="t('logs.typeError')" value="error" />
+            </el-select>
 
-                <el-date-picker
-                    v-model="filters.range"
-                    type="datetimerange"
-                    :start-placeholder="t('logs.from')"
-                    :end-placeholder="t('logs.to')"
-                    value-format="YYYY-MM-DD HH:mm:ss"
-                    size="default"
-                    style="width: 360px"
-                    clearable
-                    @change="fetchLogs"
+            <el-select
+                v-model="filters.target_type"
+                :placeholder="t('logs.targetTypeAll')"
+                style="width: 160px"
+                clearable
+                @change="fetchLogs"
+            >
+                <el-option
+                    v-for="opt in targetTypeOptions"
+                    :key="opt.value"
+                    :label="opt.label"
+                    :value="opt.value"
                 />
+            </el-select>
 
-                <el-button @click="fetchLogs">
-                    <el-icon><Refresh /></el-icon>
-                </el-button>
+            <el-date-picker
+                v-model="filters.range"
+                type="datetimerange"
+                :start-placeholder="t('logs.from')"
+                :end-placeholder="t('logs.to')"
+                value-format="YYYY-MM-DD HH:mm:ss"
+                style="width: 340px"
+                clearable
+                @change="fetchLogs"
+            />
 
-                <el-button type="danger" plain :disabled="!logs.length" @click="deleteAll">
-                    <el-icon style="margin-right: 4px"><Delete /></el-icon>
-                    {{ t('logs.deleteAll') }}
-                </el-button>
-            </div>
-        </div>
+            <el-button @click="fetchLogs">
+                <el-icon><Refresh /></el-icon>
+            </el-button>
 
-        <div v-if="filters.target_id" style="margin-bottom: 12px">
+            <div class="admin-toolbar__spacer" />
+
+            <el-button type="danger" plain :disabled="!logs.length" @click="deleteAll">
+                <el-icon style="margin-right: 4px"><Delete /></el-icon>
+                {{ t('logs.deleteAll') }}
+            </el-button>
+        </AdminToolbar>
+
+        <div v-if="filters.target_id" class="admin-filter-chip">
             <el-tag
                 type="primary"
                 closable
@@ -80,9 +80,7 @@
                 @close="clearTargetIdFilter"
             >
                 {{ t('logs.filteringByTarget') }}:
-                <span style="font-family: monospace; font-size: 12px; margin-left: 4px">
-                    {{ filters.target_id }}
-                </span>
+                <span class="cell-mono" style="margin-left: 4px">{{ filters.target_id }}</span>
             </el-tag>
         </div>
 
@@ -107,19 +105,19 @@
         <el-table
             v-loading="loading"
             :data="logs"
-            stripe
-            border
+            class="admin-table"
             style="width: 100%"
             :empty-text="t('common.noData')"
         >
             <el-table-column prop="time" :label="t('logs.time')" width="180">
                 <template #default="{ row }">
-                    {{ formatTime(row.time) }}
+                    <span class="cell-time">{{ formatTime(row.time) }}</span>
                 </template>
             </el-table-column>
             <el-table-column :label="t('logs.type')" width="110">
                 <template #default="{ row }">
                     <el-tag
+                        class="status-pill"
                         :type="typeTagType(row.type)"
                         size="small"
                         disable-transitions
@@ -130,24 +128,28 @@
             </el-table-column>
             <el-table-column :label="t('logs.targetType')" width="120">
                 <template #default="{ row }">
-                    <el-tag v-if="row.target_type" size="small" disable-transitions type="info">
+                    <el-tag v-if="row.target_type" class="badge-soft" size="small" disable-transitions>
                         {{ row.target_type }}
                     </el-tag>
-                    <span v-else style="color: #9ca3af">-</span>
+                    <span v-else class="cell-muted">—</span>
                 </template>
             </el-table-column>
             <el-table-column prop="target_id" :label="t('logs.targetId')" width="290">
                 <template #default="{ row }">
-                    <span style="font-family: monospace; font-size: 12px">{{ row.target_id || '-' }}</span>
+                    <span class="cell-mono">{{ row.target_id || '—' }}</span>
                 </template>
             </el-table-column>
             <el-table-column :label="t('logs.user')" width="230">
                 <template #default="{ row }">
-                    <span v-if="row.user">{{ row.user.display_name || row.user.email }}</span>
-                    <span v-else style="color: #9ca3af">-</span>
+                    <span v-if="row.user" class="cell-secondary">{{ row.user.display_name || row.user.email }}</span>
+                    <span v-else class="cell-muted">—</span>
                 </template>
             </el-table-column>
-            <el-table-column prop="message" :label="t('logs.message')" min-width="240" />
+            <el-table-column prop="message" :label="t('logs.message')" min-width="240">
+                <template #default="{ row }">
+                    <span class="cell-meta" style="font-size: 0.8125rem; color: var(--foreground)">{{ row.message }}</span>
+                </template>
+            </el-table-column>
             <el-table-column
                 :label="t('common.actions')"
                 :width="isMobile ? 56 : 120"
@@ -169,7 +171,7 @@
             </el-table-column>
         </el-table>
 
-        <div style="margin-top: 12px; display: flex; justify-content: flex-end">
+        <AdminPagination>
             <el-pagination
                 v-model:current-page="pagination.page"
                 v-model:page-size="pagination.perPage"
@@ -180,6 +182,7 @@
                 @current-change="fetchLogs"
                 @size-change="onPageSizeChange"
             />
+        </AdminPagination>
         </div>
     </div>
 </template>
@@ -190,6 +193,9 @@ import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { http } from '../api/http';
+import AdminPageHeader from '../components/AdminPageHeader.vue';
+import AdminToolbar from '../components/AdminToolbar.vue';
+import AdminPagination from '../components/AdminPagination.vue';
 import { useIsMobile } from '../composables/useIsMobile';
 
 const route = useRoute();

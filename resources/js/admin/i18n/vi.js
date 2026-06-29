@@ -99,6 +99,7 @@ export default {
         uploadUpdateNotZip: 'Vui lòng chọn tệp .zip hợp lệ',
     },
     profiles: {
+        pageSubtitle: 'Quản lý profile trình duyệt, trạng thái sử dụng và chia sẻ',
         tabActive: 'Đang hoạt động',
         tabTrash: 'Thùng rác',
         name: 'Tên profile',
@@ -142,6 +143,7 @@ export default {
         viewLogs: 'Xem nhật ký',
     },
     proxies: {
+        pageSubtitle: 'Thêm và quản lý proxy gán cho profile',
         rawProxy: 'Proxy',
         tags: 'Tag',
         createdAt: 'Ngày tạo',
@@ -160,6 +162,7 @@ export default {
     groups: {
         create: 'Tạo nhóm',
         edit: 'Sửa nhóm',
+        pageSubtitle: 'Tổ chức profile theo nhóm và quyền truy cập',
         name: 'Tên nhóm',
         sortOrder: 'Thứ tự',
         creator: 'Người tạo',
@@ -174,6 +177,7 @@ export default {
     },
     logs: {
         title: 'Nhật ký hệ thống',
+        pageSubtitle: 'Theo dõi hoạt động API và thao tác trên hệ thống',
         time: 'Thời gian',
         type: 'Loại',
         targetId: 'Mã đối tượng',

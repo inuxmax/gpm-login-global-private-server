@@ -1,15 +1,16 @@
 <template>
-    <div class="page-card">
-        <div class="page-card-title" style="justify-content: space-between; display: flex">
-            <div style="display: flex; align-items: center; gap: 8px">
-                <el-icon><Connection /></el-icon>
-                {{ t('menu.proxies') }}
-            </div>
-            <div style="display: flex; gap: 8px; align-items: center">
+    <div class="admin-page">
+        <AdminPageHeader
+            icon="Connection"
+            tone="sky"
+            :title="t('menu.proxies')"
+            :subtitle="t('proxies.pageSubtitle')"
+        >
+            <template #actions>
                 <el-input
                     v-model="search"
                     :placeholder="t('common.searchPlaceholder')"
-                    style="width: 260px"
+                    style="width: 240px"
                     clearable
                     @input="onSearchInput"
                 >
@@ -24,16 +25,14 @@
                     <el-icon style="margin-right: 4px"><Plus /></el-icon>
                     {{ t('proxies.addBulk') }}
                 </el-button>
-            </div>
-        </div>
+            </template>
+        </AdminPageHeader>
 
-        <div
+        <div class="page-card admin-page-body">
+        <AdminBulkBar
             v-if="selection.length > 0"
-            style="display: flex; gap: 8px; align-items: center; margin-bottom: 12px; padding: 8px 12px; background: #f3f4f6; border-radius: 6px"
+            :count-label="t('profiles.selected', { count: selection.length })"
         >
-            <el-tag type="info" disable-transitions>
-                {{ t('profiles.selected', { count: selection.length }) }}
-            </el-tag>
             <el-button type="info" plain size="default" @click="openBulkShare">
                 <el-icon style="margin-right: 3px"><Share /></el-icon>
                 {{ t('share.title') }}
@@ -42,13 +41,12 @@
                 <el-icon style="margin-right: 3px"><Delete /></el-icon>
                 {{ t('common.delete') }}
             </el-button>
-        </div>
+        </AdminBulkBar>
 
         <el-table
             v-loading="loading"
             :data="rows"
-            stripe
-            border
+            class="admin-table"
             style="width: 100%"
             :empty-text="t('proxies.empty')"
             @selection-change="(v) => (selection = v)"
@@ -56,43 +54,42 @@
             <el-table-column type="selection" width="44" />
             <el-table-column :label="t('proxies.rawProxy')" min-width="320">
                 <template #default="{ row }">
-                    <div style="display: flex; flex-direction: column; line-height: 1.3">
-                        <div style="display: flex; align-items: center; gap: 6px">
+                    <div class="cell-stack">
+                        <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap">
                             <el-tag
                                 v-if="parseProxy(row.raw_proxy).protocol"
+                                class="status-pill"
                                 size="small"
                                 :type="protocolTagType(parseProxy(row.raw_proxy).protocol)"
                                 disable-transitions
                             >
                                 {{ parseProxy(row.raw_proxy).protocol }}
                             </el-tag>
-                            <span style="font-family: monospace; font-weight: 500">
+                            <span class="cell-secondary" style="font-family: ui-monospace, monospace">
                                 {{ displayHostPort(row.raw_proxy) }}
                             </span>
                             <el-icon
                                 v-if="parseProxy(row.raw_proxy).hasAuth"
-                                style="color: #f59e0b"
+                                style="color: var(--warning)"
                                 :title="'Has authentication'"
                             >
                                 <Lock />
                             </el-icon>
                         </div>
-                        <span style="font-size: 11px; color: #9ca3af; font-family: monospace">
-                            {{ row.raw_proxy }}
-                        </span>
+                        <span class="cell-mono">{{ row.raw_proxy }}</span>
                     </div>
                 </template>
             </el-table-column>
             <el-table-column :label="t('proxies.tags')" min-width="180">
                 <template #default="{ row }">
-                    <span v-if="!row.tags?.length" style="color: #9ca3af">—</span>
+                    <span v-if="!row.tags?.length" class="cell-muted">—</span>
                     <el-tag
                         v-for="tag in row.tags"
                         :key="tag.id"
                         size="small"
                         :style="tagStyle(tag)"
                         disable-transitions
-                        style="margin-right: 4px"
+                        style="margin: 2px 4px 2px 0"
                     >
                         {{ tag.name }}
                     </el-tag>
@@ -100,7 +97,7 @@
             </el-table-column>
             <el-table-column :label="t('proxies.createdAt')" width="170">
                 <template #default="{ row }">
-                    <span style="font-size: 12px; color: #6b7280">{{ formatTime(row.created_at) }}</span>
+                    <span class="cell-time">{{ formatTime(row.created_at) }}</span>
                 </template>
             </el-table-column>
             <el-table-column
@@ -129,7 +126,7 @@
                         </template>
                     </el-dropdown>
 
-                    <template v-else>
+                    <div v-else class="admin-action-btns">
                         <el-button size="small" type="info" plain @click="openShare(row)">
                             <el-icon><Share /></el-icon>
                         </el-button>
@@ -140,12 +137,12 @@
                         <el-button size="small" type="danger" plain :loading="row._busy" @click="deleteRow(row)">
                             <el-icon><Delete /></el-icon>
                         </el-button>
-                    </template>
+                    </div>
                 </template>
             </el-table-column>
         </el-table>
 
-        <div style="display: flex; justify-content: flex-end; margin-top: 16px">
+        <AdminPagination>
             <el-pagination
                 v-model:current-page="page"
                 v-model:page-size="perPage"
@@ -156,6 +153,7 @@
                 @current-change="fetchList"
                 @size-change="onSizeChange"
             />
+        </AdminPagination>
         </div>
 
         <ShareDialog
@@ -232,6 +230,9 @@ import { useI18n } from 'vue-i18n';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { http } from '../api/http';
 import ShareDialog from '../components/ShareDialog.vue';
+import AdminPageHeader from '../components/AdminPageHeader.vue';
+import AdminBulkBar from '../components/AdminBulkBar.vue';
+import AdminPagination from '../components/AdminPagination.vue';
 import { useIsMobile } from '../composables/useIsMobile';
 
 const { t } = useI18n();

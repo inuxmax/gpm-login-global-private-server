@@ -1,13 +1,14 @@
 <template>
-    <div class="page-card">
-        <div class="page-card-title" style="justify-content: space-between; display: flex">
-            <div style="display: flex; align-items: center; gap: 8px">
-                <el-icon><UserFilled /></el-icon>
-                {{ t('menu.profiles') }}
-            </div>
-        </div>
+    <div class="admin-page">
+        <AdminPageHeader
+            icon="UserFilled"
+            tone="brand"
+            :title="t('menu.profiles')"
+            :subtitle="t('profiles.pageSubtitle')"
+        />
 
-        <el-tabs v-model="tab" @tab-change="onTabChange" style="margin-bottom: 0">
+        <div class="page-card admin-page-body">
+        <el-tabs v-model="tab" class="admin-tabs" @tab-change="onTabChange">
             <el-tab-pane :label="t('profiles.tabActive')" name="active">
                 <template #label>
                     <span style="display: inline-flex; align-items: center; gap: 4px">
@@ -26,7 +27,7 @@
             </el-tab-pane>
         </el-tabs>
 
-        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0 16px; align-items: center">
+        <AdminToolbar>
             <el-input
                 v-model="search"
                 :placeholder="t('common.searchPlaceholder')"
@@ -104,40 +105,39 @@
                 </el-checkbox-group>
             </el-popover>
 
-            <div style="flex: 1"></div>
+            <div class="admin-toolbar__spacer" />
+        </AdminToolbar>
 
-            <template v-if="selection.length > 0">
-                <el-tag type="info" disable-transitions>
-                    {{ t('profiles.selected', { count: selection.length }) }}
-                </el-tag>
-                <template v-if="tab === 'active'">
-                    <el-button type="info" plain size="default" @click="openBulkShare">
-                        <el-icon style="margin-right: 3px"><Share /></el-icon>
-                        {{ t('share.title') }}
-                    </el-button>
-                    <el-button type="warning" plain size="default" :loading="bulkBusy" @click="bulkSoftDelete">
-                        <el-icon style="margin-right: 3px"><Delete /></el-icon>
-                        {{ t('profiles.softDelete') }}
-                    </el-button>
-                </template>
-                <template v-else>
-                    <el-button type="success" plain size="default" :loading="bulkBusy" @click="bulkRestore">
-                        <el-icon style="margin-right: 3px"><RefreshRight /></el-icon>
-                        {{ t('profiles.restore') }}
-                    </el-button>
-                    <el-button type="danger" plain size="default" :loading="bulkBusy" @click="bulkHardDelete">
-                        <el-icon style="margin-right: 3px"><Remove /></el-icon>
-                        {{ t('profiles.hardDelete') }}
-                    </el-button>
-                </template>
+        <AdminBulkBar
+            v-if="selection.length > 0"
+            :count-label="t('profiles.selected', { count: selection.length })"
+        >
+            <template v-if="tab === 'active'">
+                <el-button type="info" plain size="default" @click="openBulkShare">
+                    <el-icon style="margin-right: 3px"><Share /></el-icon>
+                    {{ t('share.title') }}
+                </el-button>
+                <el-button type="warning" plain size="default" :loading="bulkBusy" @click="bulkSoftDelete">
+                    <el-icon style="margin-right: 3px"><Delete /></el-icon>
+                    {{ t('profiles.softDelete') }}
+                </el-button>
             </template>
-        </div>
+            <template v-else>
+                <el-button type="success" plain size="default" :loading="bulkBusy" @click="bulkRestore">
+                    <el-icon style="margin-right: 3px"><RefreshRight /></el-icon>
+                    {{ t('profiles.restore') }}
+                </el-button>
+                <el-button type="danger" plain size="default" :loading="bulkBusy" @click="bulkHardDelete">
+                    <el-icon style="margin-right: 3px"><Remove /></el-icon>
+                    {{ t('profiles.hardDelete') }}
+                </el-button>
+            </template>
+        </AdminBulkBar>
 
         <el-table
             v-loading="loading"
             :data="rows"
-            stripe
-            border
+            class="admin-table"
             style="width: 100%"
             :empty-text="tab === 'active' ? t('profiles.empty') : t('profiles.emptyTrash')"
             @selection-change="(v) => (selection = v)"
@@ -146,12 +146,9 @@
             <el-table-column :label="t('profiles.name')" min-width="220">
                 <template #default="{ row }">
                     <el-tooltip :content="row.id" placement="top" :show-after="400">
-                        <div style="display: flex; flex-direction: column; line-height: 1.3">
-                            <span style="font-weight: 500">{{ row.name }}</span>
-                            <span
-                                v-if="row.creator"
-                                style="font-size: 11px; color: #9ca3af; display: inline-flex; align-items: center; gap: 3px"
-                            >
+                        <div class="cell-stack">
+                            <span class="cell-primary">{{ row.name }}</span>
+                            <span v-if="row.creator" class="cell-meta">
                                 <el-icon :size="11"><User /></el-icon>
                                 {{ row.creator.display_name || row.creator.email }}
                             </span>
@@ -183,6 +180,7 @@
                 <template #default="{ row }">
                     <el-tag
                         v-if="row.status === 1"
+                        class="status-pill"
                         type="success"
                         size="small"
                         disable-transitions
@@ -190,7 +188,7 @@
                         <el-icon style="vertical-align: middle; margin-right: 3px"><CircleCheck /></el-icon>
                         {{ t('profiles.statusReady') }}
                     </el-tag>
-                    <el-tag v-else type="warning" size="small" disable-transitions>
+                    <el-tag v-else class="status-pill" type="warning" size="small" disable-transitions>
                         <el-icon style="vertical-align: middle; margin-right: 3px"><Loading /></el-icon>
                         {{ t('profiles.statusInUse') }}
                     </el-tag>
@@ -198,11 +196,11 @@
             </el-table-column>
             <el-table-column v-if="col('usingBy')" :label="t('profiles.usingBy')" min-width="170">
                 <template #default="{ row }">
-                    <div v-if="row.current_user">
-                        <div style="font-weight: 500">{{ row.current_user.display_name || '—' }}</div>
-                        <div style="font-size: 12px; color: #6b7280">{{ row.current_user.email }}</div>
+                    <div v-if="row.current_user" class="cell-stack">
+                        <span class="cell-secondary">{{ row.current_user.display_name || '—' }}</span>
+                        <span class="cell-meta">{{ row.current_user.email }}</span>
                     </div>
-                    <span v-else style="color: #9ca3af">—</span>
+                    <span v-else class="cell-muted">—</span>
                 </template>
             </el-table-column>
             <el-table-column v-if="col('storage')" :label="t('profiles.storagePath')" width="130" align="center">
@@ -226,7 +224,7 @@
                 width="170"
             >
                 <template #default="{ row }">
-                    <span style="font-size: 12px; color: #6b7280">
+                    <span class="cell-time">
                         {{ formatTime(tab === 'trash' ? row.deleted_at : row.created_at) }}
                     </span>
                 </template>
@@ -335,6 +333,20 @@
             </el-table-column>
         </el-table>
 
+        <AdminPagination>
+            <el-pagination
+                v-model:current-page="page"
+                v-model:page-size="perPage"
+                :page-sizes="[10, 20, 30, 50, 100]"
+                :total="total"
+                layout="total, sizes, prev, pager, next, jumper"
+                background
+                @current-change="fetchList"
+                @size-change="onSizeChange"
+            />
+        </AdminPagination>
+        </div>
+
         <ShareDialog
             v-model="shareDialog.visible"
             type="profile"
@@ -390,19 +402,6 @@
                 </el-button>
             </template>
         </el-dialog>
-
-        <div style="display: flex; justify-content: flex-end; margin-top: 16px">
-            <el-pagination
-                v-model:current-page="page"
-                v-model:page-size="perPage"
-                :page-sizes="[10, 20, 30, 50, 100]"
-                :total="total"
-                layout="total, sizes, prev, pager, next, jumper"
-                background
-                @current-change="fetchList"
-                @size-change="onSizeChange"
-            />
-        </div>
     </div>
 </template>
 
@@ -413,6 +412,10 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 import { http } from '../api/http';
 import ShareDialog from '../components/ShareDialog.vue';
 import LogListDialog from '../components/LogListDialog.vue';
+import AdminPageHeader from '../components/AdminPageHeader.vue';
+import AdminToolbar from '../components/AdminToolbar.vue';
+import AdminBulkBar from '../components/AdminBulkBar.vue';
+import AdminPagination from '../components/AdminPagination.vue';
 import { useIsMobile } from '../composables/useIsMobile';
 
 const { t } = useI18n();

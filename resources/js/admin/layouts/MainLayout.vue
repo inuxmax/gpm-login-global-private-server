@@ -21,21 +21,6 @@
         </el-drawer>
 
         <div class="mail1s-main">
-            <nav class="mail1s-sidebar--mobile-strip">
-                <router-link
-                    v-for="item in flatMenuItems"
-                    :key="item.path"
-                    :to="item.path"
-                    class="mail1s-nav-item"
-                    :class="{ 'is-active': activeMenu === item.path }"
-                >
-                    <span class="mail1s-nav-icon">
-                        <el-icon><component :is="item.icon" /></el-icon>
-                    </span>
-                    <span class="mail1s-nav-label">{{ t(item.labelKey) }}</span>
-                </router-link>
-            </nav>
-
             <header class="mail1s-topbar">
                 <div class="mail1s-topbar-left">
                     <button type="button" class="mail1s-icon-btn mail1s-burger" @click="drawerOpen = true">
@@ -153,24 +138,6 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleAdvancedShortc
 
 const drawerOpen = ref(false);
 watch(() => route.path, () => (drawerOpen.value = false));
-
-const flatMenuItems = computed(() => {
-    const items = [
-        { path: '/admin/app/system', icon: 'Setting', labelKey: 'menu.systemSettings' },
-        { path: '/admin/app/users', icon: 'User', labelKey: 'menu.users' },
-        { path: '/admin/app/groups', icon: 'Collection', labelKey: 'menu.groups' },
-        { path: '/admin/app/profiles', icon: 'UserFilled', labelKey: 'menu.profiles' },
-        { path: '/admin/app/proxies', icon: 'Connection', labelKey: 'menu.proxies' },
-        { path: '/admin/app/logs', icon: 'Document', labelKey: 'menu.logs' },
-        { path: '/admin/app/system-logs', icon: 'Tickets', labelKey: 'menu.systemLogs' },
-    ];
-    if (showAdvanced.value) {
-        items.push({ path: '/admin/app/sql', icon: 'Operation', labelKey: 'menu.sqlConsole' });
-    }
-    return items;
-});
-
-const activeMenu = computed(() => route.path);
 
 const localeOptions = [
     { value: 'vi', label: 'Tiếng Việt' },

@@ -1,15 +1,16 @@
 <template>
-    <div class="page-card">
-        <div class="page-card-title" style="justify-content: space-between; display: flex">
-            <div style="display: flex; align-items: center; gap: 8px">
-                <el-icon><Collection /></el-icon>
-                {{ t('menu.groups') }}
-            </div>
-            <div style="display: flex; gap: 8px; align-items: center">
+    <div class="admin-page">
+        <AdminPageHeader
+            icon="Collection"
+            tone="violet"
+            :title="t('menu.groups')"
+            :subtitle="t('groups.pageSubtitle')"
+        >
+            <template #actions>
                 <el-input
                     v-model="search"
                     :placeholder="t('common.searchPlaceholder')"
-                    style="width: 260px"
+                    style="width: 240px"
                     clearable
                     @input="onSearch"
                 >
@@ -24,45 +25,43 @@
                     <el-icon style="margin-right: 4px"><Plus /></el-icon>
                     {{ t('groups.create') }}
                 </el-button>
-            </div>
-        </div>
+            </template>
+        </AdminPageHeader>
 
+        <div class="page-card admin-page-body">
         <el-table
             v-loading="loading"
             :data="rows"
-            stripe
-            border
+            class="admin-table"
             style="width: 100%"
             :empty-text="t('common.noData')"
         >
             <el-table-column :label="t('groups.name')" min-width="280">
                 <template #default="{ row }">
-                    <div style="display: flex; flex-direction: column; gap: 2px">
+                    <div class="cell-stack">
                         <div style="display: flex; align-items: center; gap: 8px">
-                            <span>{{ row.name }}</span>
-                            <el-tag v-if="isDefaultGroup(row)" type="info" size="small" disable-transitions>
+                            <span class="cell-primary">{{ row.name }}</span>
+                            <el-tag v-if="isDefaultGroup(row)" class="badge-soft" size="small" disable-transitions>
                                 {{ t('groups.defaultBadge') }}
                             </el-tag>
                         </div>
-                        <span style="font-family: monospace; font-size: 11px; color: #9ca3af">
-                            {{ row.id }}
-                        </span>
+                        <span class="cell-mono">{{ row.id }}</span>
                     </div>
                 </template>
             </el-table-column>
             <el-table-column prop="sort_order" :label="t('groups.sortOrder')" width="120" align="center" />
             <el-table-column :label="t('groups.creator')" min-width="200">
                 <template #default="{ row }">
-                    <div v-if="row.creator" style="display: flex; flex-direction: column">
-                        <span style="font-weight: 500">{{ row.creator.display_name || '—' }}</span>
-                        <span style="font-size: 12px; color: #6b7280">{{ row.creator.email }}</span>
+                    <div v-if="row.creator" class="cell-stack">
+                        <span class="cell-secondary">{{ row.creator.display_name || '—' }}</span>
+                        <span class="cell-meta">{{ row.creator.email }}</span>
                     </div>
-                    <span v-else style="color: #9ca3af">—</span>
+                    <span v-else class="cell-muted">—</span>
                 </template>
             </el-table-column>
             <el-table-column :label="t('groups.updatedAt')" width="170">
                 <template #default="{ row }">
-                    <span style="font-size: 12px; color: #6b7280">{{ formatTime(row.updated_at) }}</span>
+                    <span class="cell-time">{{ formatTime(row.updated_at) }}</span>
                 </template>
             </el-table-column>
             <el-table-column
@@ -96,7 +95,7 @@
                         </template>
                     </el-dropdown>
 
-                    <template v-else>
+                    <div v-else class="admin-action-btns">
                         <el-button
                             size="small"
                             type="info"
@@ -126,12 +125,12 @@
                         >
                             <el-icon><Delete /></el-icon>
                         </el-button>
-                    </template>
+                    </div>
                 </template>
             </el-table-column>
         </el-table>
 
-        <div style="display: flex; justify-content: flex-end; margin-top: 16px">
+        <AdminPagination>
             <el-pagination
                 v-model:current-page="page"
                 v-model:page-size="perPage"
@@ -142,6 +141,7 @@
                 @current-change="fetchGroups"
                 @size-change="onSizeChange"
             />
+        </AdminPagination>
         </div>
 
         <ShareDialog
@@ -187,6 +187,8 @@ import { useI18n } from 'vue-i18n';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { http } from '../api/http';
 import ShareDialog from '../components/ShareDialog.vue';
+import AdminPageHeader from '../components/AdminPageHeader.vue';
+import AdminPagination from '../components/AdminPagination.vue';
 import { useIsMobile } from '../composables/useIsMobile';
 
 const { t } = useI18n();

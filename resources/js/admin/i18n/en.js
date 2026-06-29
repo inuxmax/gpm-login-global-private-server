@@ -99,6 +99,7 @@ export default {
         uploadUpdateNotZip: 'Please select a valid .zip file',
     },
     profiles: {
+        pageSubtitle: 'Manage browser profiles, usage status, and sharing',
         tabActive: 'Active',
         tabTrash: 'Trash',
         name: 'Profile name',
@@ -142,6 +143,7 @@ export default {
         viewLogs: 'View logs',
     },
     proxies: {
+        pageSubtitle: 'Add and manage proxies assigned to profiles',
         rawProxy: 'Proxy',
         tags: 'Tags',
         createdAt: 'Created',
@@ -160,6 +162,7 @@ export default {
     groups: {
         create: 'New group',
         edit: 'Edit group',
+        pageSubtitle: 'Organize profiles by group and access permissions',
         name: 'Group name',
         sortOrder: 'Order',
         creator: 'Created by',
@@ -174,6 +177,7 @@ export default {
     },
     logs: {
         title: 'System logs',
+        pageSubtitle: 'Track API activity and operations across the system',
         time: 'Time',
         type: 'Type',
         targetId: 'Target ID',

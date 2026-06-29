@@ -39,16 +39,38 @@ Menu được nhóm theo i18n:
 ## Mobile
 
 - Sidebar desktop ẩn dưới 768px.
-- Burger mở `el-drawer` sidebar.
-- Thanh nav ngang cuộn (`mail1s-sidebar--mobile-strip`) hiển thị các mục chính.
+- Burger mở `el-drawer` sidebar (không còn thanh nav ngang trùng menu).
 
 ## Page pattern
 
-Các trang admin dùng class:
+Các trang danh sách (Profiles, Groups, Proxies, Logs) dùng layout:
+
+```
+admin-page
+├── AdminPageHeader (banner gradient + actions)
+└── page-card admin-page-body
+    ├── AdminToolbar (bộ lọc)
+    ├── AdminBulkBar (chọn nhiều — tùy trang)
+    ├── el-table.admin-table
+    └── AdminPagination
+```
+
+Component:
+
+| Component | File |
+|-----------|------|
+| `AdminPageHeader` | `components/AdminPageHeader.vue` |
+| `AdminToolbar` | `components/AdminToolbar.vue` |
+| `AdminBulkBar` | `components/AdminBulkBar.vue` |
+| `AdminPagination` | `components/AdminPagination.vue` |
+
+Class CSS hữu ích:
 
 - `.page-card` — card nội dung có viền accent trên cùng
-- `.page-card-title` — tiêu đề section
-- `.page-header-banner` — banner đầu trang (tùy trang)
+- `.admin-table` — bảng không viền dày, header uppercase, hover mềm
+- `.cell-primary`, `.cell-meta`, `.cell-mono`, `.cell-time` — typography ô bảng
+- `.status-pill`, `.badge-soft` — tag trạng thái
+- `.admin-action-btns` — nhóm nút hành động trong bảng
 
 ## Build frontend
 

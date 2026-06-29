@@ -99,6 +99,7 @@ export default {
         uploadUpdateNotZip: '请选择有效的 .zip 文件',
     },
     profiles: {
+        pageSubtitle: '管理浏览器配置文件、使用状态与共享',
         tabActive: '活跃',
         tabTrash: '回收站',
         name: '配置名称',
@@ -142,6 +143,7 @@ export default {
         viewLogs: '查看日志',
     },
     proxies: {
+        pageSubtitle: '添加并管理分配给配置文件的代理',
         rawProxy: '代理',
         tags: '标签',
         createdAt: '创建时间',
@@ -160,6 +162,7 @@ export default {
     groups: {
         create: '新建分组',
         edit: '编辑分组',
+        pageSubtitle: '按分组组织配置文件与访问权限',
         name: '分组名称',
         sortOrder: '排序',
         creator: '创建者',
@@ -174,6 +177,7 @@ export default {
     },
     logs: {
         title: '系统日志',
+        pageSubtitle: '跟踪 API 活动与系统操作记录',
         time: '时间',
         type: '类型',
         targetId: '对象 ID',
