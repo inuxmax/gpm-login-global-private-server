@@ -8,8 +8,9 @@ use Illuminate\Support\Facades\DB;
 
 class UpdateService
 {
-    public function updateFromRemoteZip(string $zipUrl = 'https://github.com/ngochoaitn/gpm-login-global-private-server/releases/download/latest/latest-update.zip')
+    public function updateFromRemoteZip(?string $zipUrl = null)
     {
+        $zipUrl = $zipUrl ?: config('app.update_zip_url');
         $zipFileName = 'update.zip';
         $zipFilePath = storage_path('app/' . $zipFileName);
 

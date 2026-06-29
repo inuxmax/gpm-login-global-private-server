@@ -212,4 +212,19 @@ return [
         // 'ExampleClass' => App\Example\ExampleClass::class,
     ])->toArray(),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Auto-update ZIP URL
+    |--------------------------------------------------------------------------
+    |
+    | URL tải file latest-update.zip khi admin bấm "Cập nhật private server".
+    | Đặt UPDATE_ZIP_URL trong .env để trỏ release của repo fork của bạn.
+    |
+    */
+
+    'update_zip_url' => env(
+        'UPDATE_ZIP_URL',
+        'https://github.com/ngochoaitn/gpm-login-global-private-server/releases/download/latest/latest-update.zip'
+    ),
+
 ];

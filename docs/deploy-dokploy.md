@@ -73,6 +73,16 @@ Tài khoản admin mặc định sau seed:
 
 Admin UI: `https://your-domain.com/admin/app`
 
+## Auto-update (repo riêng)
+
+Mặc định auto-update tải zip từ repo gốc `ngochoaitn`. Thêm env:
+
+```env
+UPDATE_ZIP_URL=https://github.com/USER/REPO/releases/download/latest/latest-update.zip
+```
+
+Chi tiết tạo release zip: [docs/auto-update.md](auto-update.md)
+
 ### Kiểm tra env DB khớp với Dokploy Database
 
 Trong Dokploy → Database → **Internal Credentials**, copy chính xác:
